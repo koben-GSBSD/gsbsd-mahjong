@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMC · GSBSD Mahjong Community</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{
+  --bg:#0f0e0d;--surface:#1a1815;--card:#221f1c;--border:#2e2a26;
+  --gold:#c9933a;--gold-lt:#e8b86d;--red:#c0392b;--green:#27ae60;
+  --text:#e8e0d5;--muted:#8a7f72;--blue:#3498db;--purple:#9b59b6;
+  --sidebar-w:220px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .25s ease}
+.sidebar.collapsed{transform:translateX(-100%)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199}
+.sidebar-overlay.show{display:block}
+.logo{padding:16px 14px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+/* Logo slot — swappable */
+.logo-slot{width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;position:relative;cursor:pointer;border:1.5px solid var(--border);background:var(--card)}
+.logo-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.logo-slot-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:13px;opacity:0;transition:opacity .2s}
+.logo-slot:hover .logo-slot-overlay{opacity:1}
+.logo-text .logo-name{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;color:var(--gold);letter-spacing:.02em;line-height:1.2}
+.logo-text .logo-sub{font-size:8px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-top:2px;line-height:1.3}
+.nav{flex:1;padding:10px 0;overflow-y:auto}
+.nav-section{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;padding:10px 18px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent;white-space:nowrap}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.nav-item.active{color:var(--gold);background:rgba(201,147,58,.08);border-left-color:var(--gold)}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border)}
+.host-badge{display:flex;align-items:center;gap:8px;background:rgba(201,147,58,.1);border:1px solid rgba(201,147,58,.25);border-radius:8px;padding:9px 11px}
+.host-avatar{width:30px;height:30px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0f0e0d;flex-shrink:0}
+.host-name{font-size:12px;font-weight:600;color:var(--gold)}
+.host-role{font-size:10px;color:var(--muted)}
+.topbar{position:fixed;top:0;left:0;right:0;height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:100}
+.sidebar-toggle{width:36px;height:36px;background:transparent;border:1px solid var(--border);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);transition:all .15s;flex-shrink:0}
+.sidebar-toggle:hover{border-color:var(--gold);color:var(--gold)}
+.topbar-title{font-size:14px;font-weight:600;color:var(--text);flex:1}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.main{margin-left:0;padding:68px 20px 32px;transition:margin-left .25s ease;min-height:100vh}
+.page{display:none}.page.active{display:block}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+.page-title{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;color:var(--text)}
+.page-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.btn-primary{background:var(--gold);color:#0f0e0d}.btn-primary:hover{background:var(--gold-lt)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:var(--red);color:white}
+.btn-success{background:var(--green);color:white}
+.btn-sm{padding:5px 10px;font-size:12px}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;color:var(--text)}
+.stat-change{font-size:11px;color:var(--green);margin-top:3px}
+.section{margin-bottom:22px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.card-pad{padding:18px 20px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table{width:100%;border-collapse:collapse;min-width:460px}
+.table th{text-align:left;padding:9px 14px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:11px 14px;border-bottom:1px solid rgba(46,42,38,.5);font-size:13px}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:rgba(255,255,255,.02)}
+.rank-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--muted)}
+.rank-1{color:#FFD700}.rank-2{color:#C0C0C0}.rank-3{color:#CD7F32}
+.player-info{display:flex;align-items:center;gap:9px}
+.player-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.player-name{font-weight:600;color:var(--text);font-size:13px}
+.player-joined{font-size:11px;color:var(--muted)}
+.points-val{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--gold);font-size:14px}
+.tier-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tier-s{background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.3)}
+.tier-a{background:rgba(201,147,58,.15);color:var(--gold);border:1px solid rgba(201,147,58,.3)}
+.tier-b{background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.25)}
+.tier-c{background:rgba(138,127,114,.1);color:var(--muted);border:1px solid rgba(138,127,114,.25)}
+.tier-name{font-size:9px;opacity:.85;font-weight:400;letter-spacing:0}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.form-input,.form-select{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border .15s;width:100%}
+.form-input:focus,.form-select:focus{border-color:var(--gold)}
+.form-select option{background:var(--surface)}
+.info-box{background:rgba(201,147,58,.07);border:1px solid rgba(201,147,58,.2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text);line-height:1.7;margin-bottom:14px}
+.info-box strong{color:var(--gold)}
+.warn-box{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.2);border-radius:7px;padding:9px 13px;font-size:12px;color:var(--muted);margin-top:12px}
+.notice-box{background:rgba(52,152,219,.07);border:1px solid rgba(52,152,219,.2);border-radius:7px;padding:9px 13px;font-size:12px;color:var(--text);margin-bottom:12px}
+.tier-journey{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.tj-item{flex:1;padding:12px 10px;text-align:center;border-right:1px solid var(--border);background:var(--card)}
+.tj-item:last-child{border-right:none}
+.tj-pts{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin:4px 0 2px}
+.tj-label{font-size:10px;color:var(--muted)}
+.tj-sesi{font-size:10px;margin-top:3px}
+.point-legend{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.pl-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.pl-emoji{font-size:20px;margin-bottom:4px}
+.pl-pts{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700}
+.pl-label{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+.podium{display:flex;align-items:flex-end;justify-content:center;margin:14px 0 22px}
+.podium-slot{display:flex;flex-direction:column;align-items:center;flex:1}
+.podium-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin-bottom:7px;position:relative}
+.p1 .podium-avatar{width:58px;height:58px;background:rgba(255,215,0,.15);border:2px solid #FFD700}
+.p2 .podium-avatar{background:rgba(192,192,192,.1);border:2px solid #C0C0C0}
+.p3 .podium-avatar{background:rgba(205,127,50,.1);border:2px solid #CD7F32}
+.podium-name{font-size:12px;font-weight:700;color:var(--text)}
+.podium-pts{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700}
+.p1 .podium-pts{color:#FFD700;font-size:20px}.p2 .podium-pts{color:#C0C0C0}.p3 .podium-pts{color:#CD7F32}
+.podium-plinth{width:100%;margin-top:7px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:rgba(255,255,255,.07);border-radius:5px 5px 0 0}
+.p1 .podium-plinth{background:rgba(255,215,0,.08);height:56px;border:1px solid rgba(255,215,0,.15)}
+.p2 .podium-plinth{background:rgba(192,192,192,.06);height:46px;border:1px solid rgba(192,192,192,.1)}
+.p3 .podium-plinth{background:rgba(205,127,50,.06);height:36px;border:1px solid rgba(205,127,50,.1)}
+.crown{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:18px}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.tab-btn{padding:9px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.tab-btn:hover{color:var(--text)}.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-content{display:none}.tab-content.active{display:block}
+.kas-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.kas-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.kas-amount{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;margin-top:5px}
+.kas-in{color:var(--green)}.kas-out{color:var(--red)}.kas-net{color:var(--gold)}
+.tx-type{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.tx-in{background:rgba(39,174,96,.12);color:var(--green)}.tx-out{background:rgba(192,57,43,.12);color:var(--red)}
+.status-aktif{font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(39,174,96,.12);color:var(--green)}
+.status-nonaktif{font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(138,127,114,.12);color:var(--muted)}
+.status-alumni{font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(52,152,219,.12);color:var(--blue)}
+.filter-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;background:rgba(0,0,0,.15);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.month-btn{padding:4px 11px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all .15s}
+.month-btn:hover{color:var(--text);border-color:var(--muted)}.month-btn.active{background:rgba(201,147,58,.12);border-color:var(--gold);color:var(--gold)}
+.tier-progress-bar{height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:3px}
+.tier-progress-fill{height:100%;border-radius:99px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;width:520px;max-width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Noto Serif SC',serif;font-size:17px;color:var(--text);margin-bottom:3px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── SESSION FORM A+ ── */
+.session-config{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px}
+.config-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.meja-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.meja-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
+.meja-title{font-size:13px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.meja-total{font-size:12px;color:var(--muted)}
+.meja-body{padding:14px 16px}
+.player-entry{display:grid;grid-template-columns:1fr 90px 130px 80px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(46,42,38,.4)}
+.player-entry:last-child{border-bottom:none}
+.player-entry-label{font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px}
+.wins-input{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace;font-weight:600;text-align:center;outline:none;transition:border .15s;width:100%}
+.wins-input:focus{border-color:var(--gold)}
+.wins-input::-webkit-inner-spin-button,.wins-input::-webkit-outer-spin-button{opacity:1}
+.poin-preview{text-align:center;padding:5px 8px;border-radius:6px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:70px}
+.poin-juara{background:rgba(255,215,0,.12);color:#FFD700;border:1px solid rgba(255,215,0,.25)}
+.poin-runner2{background:rgba(201,147,58,.1);color:var(--gold);border:1px solid rgba(201,147,58,.2)}
+.poin-runner1{background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.2)}
+.poin-hadir{background:rgba(138,127,114,.1);color:var(--muted);border:1px solid rgba(138,127,114,.2)}
+.rank-chip{display:inline-flex;align-items:center;justify-content:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.rc-1{background:rgba(255,215,0,.12);color:#FFD700}
+.rc-2{background:rgba(201,147,58,.1);color:var(--gold)}
+.rc-3{background:rgba(46,204,113,.1);color:#2ecc71}
+.rc-4{background:rgba(138,127,114,.1);color:var(--muted)}
+.total-games-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0 2px;border-top:1px solid var(--border);margin-top:6px}
+.total-games-label{font-size:11px;color:var(--muted)}
+.total-games-val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text)}
+
+/* Konversi preview box */
+.konversi-box{background:rgba(201,147,58,.05);border:1px solid rgba(201,147,58,.15);border-radius:8px;padding:12px 14px;margin-top:10px}
+.konversi-title{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.konversi-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.konversi-row:not(:last-child){border-bottom:1px solid rgba(46,42,38,.3)}
+.konversi-pts{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold)}
+
+/* ── RULES PAGE ── */
+.rules-section{margin-bottom:28px}
+.rules-h2{font-family:'Noto Serif SC',serif;font-size:18px;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.rules-h3{font-size:13px;font-weight:700;color:var(--text);margin:16px 0 8px;display:flex;align-items:center;gap:7px}
+.rules-p{font-size:13px;color:var(--text);line-height:1.75;margin-bottom:10px}
+.rules-p b{color:var(--gold)}
+.tile-showcase{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0}
+.tile-group{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.tile-group-name{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.tile-group-desc{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.tiles-row{display:flex;justify-content:center;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;margin-bottom:4px}
+/* SVG mahjong tile */
+.tile{width:34px;height:46px;background:linear-gradient(145deg,#f5f0e8,#e8e0d0);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.6);position:relative;flex-shrink:0;border:1px solid rgba(0,0,0,.15)}
+.tile.red{color:#c0392b}
+.tile.green{color:#27ae60}
+.tile.blue{color:#2980b9}
+.tile.black{color:#1a1208}
+.tile-dot{font-size:22px}
+.tile-char{font-size:16px;font-family:'Noto Serif SC',serif;font-weight:700}
+.tile-num{position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;line-height:1}
+.tile-suit{position:absolute;bottom:2px;right:3px;font-size:8px;line-height:1;transform:rotate(180deg)}
+.rules-flow{display:flex;align-items:stretch;gap:0;margin:16px 0;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.flow-step{flex:1;padding:14px 10px;text-align:center;border-right:1px solid var(--border);background:var(--card)}
+.flow-step:last-child{border-right:none}
+.flow-num{width:24px;height:24px;background:var(--gold);color:#0f0e0d;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin:0 auto 8px}
+.flow-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}
+.flow-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.win-condition{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:16px 18px;margin:14px 0}
+.win-condition-title{font-size:12px;font-weight:700;color:#FFD700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.win-formula{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.wf-part{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--text)}
+.wf-op{color:var(--gold);font-size:16px;font-weight:700}
+.rules-table{width:100%;border-collapse:collapse;margin:12px 0}
+.rules-table th{text-align:left;padding:8px 12px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border)}
+.rules-table td{padding:10px 12px;border-bottom:1px solid rgba(46,42,38,.4);font-size:12px;line-height:1.5}
+.rules-table tr:last-child td{border-bottom:none}
+.logout-btn{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:var(--red);font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent;margin-top:4px}
+.logout-btn:hover{background:rgba(192,57,43,.08);border-left-color:var(--red)}
+/* ── MAHJONG TILE VISUALS ── */
+/* Real tile (rt) — white melamine style like photo */
+.rt{width:36px;height:44px;background:linear-gradient(160deg,#ffffff 0%,#f0ede6 60%,#e4dfd5 100%);border-radius:5px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:2px 3px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.9),inset -1px -1px 0 rgba(0,0,0,.08);border:1px solid #b8b0a0;flex-shrink:0;position:relative;overflow:hidden;cursor:default}
+.rt svg{display:block}
+.rt-top{font-family:'Noto Serif SC',serif;font-weight:900;font-size:20px;color:#1a1208;line-height:1;margin-top:2px}
+.rt-b{color:#1a1208}
+.rt-bot{font-size:8px;color:#555;margin-top:1px;line-height:1}
+.rt-mid-wan{font-family:'Noto Serif SC',serif;font-size:12px;font-weight:900;color:#c0392b;margin-top:-1px;line-height:1}
+.mt-r{color:#c0392b}
+.mt-b{font-size:9px;color:#1a1208;font-weight:700;margin-top:1px;display:block}
+.mt-bam{font-size:12px;line-height:1.1}
+.mt-dot{display:inline-flex;flex-wrap:wrap;width:32px;height:44px;align-items:center;justify-content:center;gap:2px;padding:4px}
+.mt-honor{font-size:17px}
+.mt-h{font-size:18px;font-family:'Noto Serif SC',serif;font-weight:700;display:block;line-height:1}
+.mt-bonus{font-size:16px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:44px;background:linear-gradient(145deg,#f0ebe0,#e2d9c5);border-radius:3px;box-shadow:0 2px 4px rgba(0,0,0,.5)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.hw-tile{width:38px;height:52px;background:linear-gradient(145deg,#f5f0e8,#e8e0d0);border-radius:4px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#1a1208;box-shadow:0 3px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.7);flex-shrink:0;border:1px solid rgba(0,0,0,.2);font-family:'Noto Serif SC',serif;line-height:1}
+.hw-b{font-size:9px;color:#1a1208;font-weight:700;margin-top:2px;display:block}
+.hw-r{color:#c0392b}.hw-g{color:#27ae60}
+@media(max-width:640px){.tile-showcase{grid-template-columns:repeat(2,1fr)}.rules-flow{flex-direction:column}.flow-step{border-right:none;border-bottom:1px solid var(--border)}.flow-step:last-child{border-bottom:none}}
+@media(max-width:900px){
+  .config-grid{grid-template-columns:repeat(2,1fr)}
+  .player-entry{grid-template-columns:1fr 70px 110px 70px;gap:8px}
+}
+@media(max-width:640px){
+  .main{padding:64px 12px 24px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .point-legend{grid-template-columns:repeat(2,1fr)}
+  .kas-summary{grid-template-columns:1fr}
+  .podium-name{font-size:11px}
+  .tier-journey{flex-direction:column}
+  .tj-item{border-right:none;border-bottom:1px solid var(--border)}
+  .tj-item:last-child{border-bottom:none}
+  .page-header{flex-direction:column}
+  .config-grid{grid-template-columns:1fr 1fr}
+  .player-entry{grid-template-columns:1fr 60px;gap:6px}
+  .player-entry .rank-chip,.player-entry .poin-preview{display:none}
+  .form-grid-2{grid-template-columns:1fr}
+}
+@media print{
+  .sidebar,.topbar,.btn,.filter-bar,.sidebar-overlay{display:none!important}
+  .main{padding:16px}
+  body{background:white;color:black}
+  .card,.stat-card,.kas-card,.meja-block,.session-config{border:1px solid #ddd;background:#f9f9f9}
+}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* Player search dropdown */
+.player-search-wrap{position:relative}
+.player-search-input{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;transition:border .15s;width:100%}
+.player-search-input:focus{border-color:var(--gold)}
+.player-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--card);border:1px solid var(--gold);border-radius:8px;z-index:500;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.player-dropdown.open{display:block}
+.player-dropdown-item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(46,42,38,.4)}
+.player-dropdown-item:last-child{border-bottom:none}
+.player-dropdown-item:hover{background:rgba(201,147,58,.1);color:var(--gold)}
+.player-dropdown-item.selected{background:rgba(201,147,58,.08);color:var(--gold)}
+.player-dropdown-item .di-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.player-dropdown-item .di-name{font-weight:600;font-size:12px}
+.player-dropdown-item .di-tier{font-size:10px;color:var(--muted)}
+.selected-player-display{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(201,147,58,.08);border:1px solid rgba(201,147,58,.25);border-radius:7px;cursor:pointer}
+.selected-player-display .sp-name{font-size:13px;font-weight:600;color:var(--text);flex:1}
+.selected-player-display .sp-clear{color:var(--muted);font-size:12px;cursor:pointer;padding:0 2px}
+.selected-player-display .sp-clear:hover{color:var(--red)}
+/* Edit session modal */
+.edit-sesi-wins{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.edit-sesi-wins-header{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.edit-wins-row{display:grid;grid-template-columns:1fr 100px 120px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(46,42,38,.3)}
+.edit-wins-row:last-child{border-bottom:none}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--card);border:1px solid var(--red);border-radius:12px;padding:24px;width:380px;max-width:100%}
+.confirm-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.confirm-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.confirm-footer{display:flex;gap:10px;justify-content:flex-end}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--gold);border-radius:8px;padding:11px 16px;font-size:13px;color:var(--text);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:300px}
+</style>
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column;gap:0">
+  <div style="width:100%;max-width:380px;padding:0 20px">
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:72px;height:72px;border-radius:16px;overflow:hidden;margin:0 auto 14px;border:2px solid var(--border);background:var(--card)">
+        <img src="https://design.canva.ai/48fi2WAxiIZjr5P" style="width:100%;height:100%;object-fit:cover"
+          onerror="this.parentElement.innerHTML=\'<div style=font-size:36px;line-height:72px;text-align:center>🀄</div>\'">
+      </div>
+      <div style="font-family:\'Noto Serif SC\',serif;font-size:20px;font-weight:700;color:var(--gold)">GMC</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">GSBSD Mahjong Community</div>
+    </div>
+    <!-- Form -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px">
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Host Login</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Dashboard khusus host / admin komunitas</div>
+      <div id="login-error" style="display:none;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);border-radius:7px;padding:9px 12px;font-size:12px;color:#e74c3c;margin-bottom:14px"></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Email</label>
+          <input id="login-email" type="email" placeholder="email@example.com"
+            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:Inter,sans-serif;outline:none"
+            onkeydown="if(event.key===\'Enter\')doLogin()">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Password</label>
+          <input id="login-password" type="password" placeholder="••••••••"
+            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:Inter,sans-serif;outline:none"
+            onkeydown="if(event.key===\'Enter\')doLogin()">
+        </div>
+        <button onclick="doLogin()" id="login-btn"
+          style="width:100%;padding:10px;background:var(--gold);color:#0f0e0d;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px;font-family:Inter,sans-serif">
+          Masuk
+        </button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--muted)">
+      Leaderboard publik: <a href="?view=public" style="color:var(--gold)">lihat tanpa login →</a>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:8999;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="font-size:36px">🀄</div>
+  <div style="font-family:\'Noto Serif SC\',serif;font-size:16px;color:var(--gold)">GSBSD Mahjong Community</div>
+  <div id="loading-msg" style="font-size:12px;color:var(--muted)">Memuat aplikasi...</div>
+</div>
+
+
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar collapsed" id="sidebar">
+  <div class="logo">
+    <!-- LOGO SLOT — klik untuk ganti logo -->
+    <div class="logo-slot" id="logo-slot" onclick="openLogoUploader()" title="Klik untuk ganti logo">
+      <img id="logo-img" src="https://design.canva.ai/48fi2WAxiIZjr5P" alt="GMC Logo"
+        onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
+      <div id="logo-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:26px">🀄</div>
+      <div class="logo-slot-overlay">✏️</div>
+    </div>
+    <div class="logo-text">
+      <div class="logo-name">GMC</div>
+      <div class="logo-sub">GSBSD Mahjong Community</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="nav('leaderboard',this)"><span class="nav-icon">🏆</span>Leaderboard</div>
+    <div class="nav-item" onclick="nav('session',this)"><span class="nav-icon">🎮</span>Catat Sesi</div>
+    <div class="nav-section">Komunitas</div>
+    <div class="nav-item" onclick="nav('players',this)"><span class="nav-icon">👥</span>Pemain</div>
+    <div class="nav-item" onclick="nav('history',this)"><span class="nav-icon">📋</span>Riwayat Sesi</div>
+    <div class="nav-section">Keuangan</div>
+    <div class="nav-item" onclick="nav('kas',this)"><span class="nav-icon">💰</span>Kas Komunitas</div>
+    <div class="nav-section">Sistem</div>
+    <div class="nav-item" onclick="nav('settings',this)"><span class="nav-icon">⚙️</span>Pengaturan</div>
+    <div class="nav-item" onclick="nav('rules',this)"><span class="nav-icon">📖</span>Rules Mahjong</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="logout-btn" onclick="confirmLogout()">
+      <span style="font-size:15px">⏻</span> Logout
+    </div>
+    <div style="height:8px"></div>
+    <div class="host-badge">
+      <div class="host-avatar">K</div>
+      <div><div class="host-name">Koben</div><div class="host-role">Host / Admin</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="topbar">
+  <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+  <div style="display:flex;align-items:center;gap:8px;flex:1">
+    <span class="topbar-title" id="topbar-title">Dashboard</span>
+    <span style="font-size:11px;color:var(--muted);display:none" id="topbar-sub">GMC</span>
+  </div>
+  <div class="topbar-actions">
+    <span style="font-size:11px;color:var(--muted);margin-right:4px;display:none" class="topbar-brand-sm">GMC</span>
+    <button class="btn btn-primary btn-sm" onclick="nav('session',null)">+ Catat Sesi</button>
+  </div>
+</div>
+
+<main class="main" id="main" style="display:none">
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div id="page-dashboard" class="page active">
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-sub">Sabtu, 28 Juni 2026 · GMC — GSBSD Mahjong Community</div></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Member Aktif</div><div class="stat-value">24</div><div class="stat-change">↑ +3 bulan ini</div></div>
+    <div class="stat-card"><div class="stat-label">Sesi Bulan Ini</div><div class="stat-value">8</div><div class="stat-change">↑ +2 dari Mei</div></div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🏆 Top 10 Leaderboard Bulan Ini</span>
+      <span class="btn btn-ghost btn-sm" onclick="nav('leaderboard',null)">Lihat Semua →</span>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th style="width:40px">#</th>
+            <th>Pemain</th>
+            <th>Poin</th>
+            <th>Raja Meja 👑</th>
+            <th>Sesi</th>
+            <th>Win %</th>
+            <th>Tier</th>
+          </tr></thead>
+          <tbody id="dash-top5"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header"><span class="section-title">📐 Sistem Poin A+ Simple+</span></div>
+    <div class="point-legend">
+      <div class="pl-item"><div class="pl-emoji">👑</div><div class="pl-pts" style="color:#FFD700">+3</div><div class="pl-label">Raja Meja<br><small style="font-size:9px">Menang terbanyak di meja</small></div></div>
+      <div class="pl-item"><div class="pl-emoji">😤</div><div class="pl-pts" style="color:var(--gold)">+2</div><div class="pl-label">Nyaris Sempurna<br><small style="font-size:9px">Menang ≥ 2 game</small></div></div>
+      <div class="pl-item"><div class="pl-emoji">😏</div><div class="pl-pts" style="color:#2ecc71">+1</div><div class="pl-label">Cari Jodoh<br><small style="font-size:9px">Menang 1 game</small></div></div>
+      <div class="pl-item"><div class="pl-emoji">⬜</div><div class="pl-pts" style="color:var(--muted)">+1</div><div class="pl-label">Penonton Setia<br><small style="font-size:9px">Hadir tapi 0 menang</small></div></div>
+    </div>
+    <div class="info-box">
+      <strong>Cara Hitung Posisi per Meja:</strong><br>
+      1. Koben input jumlah kemenangan tiap pemain dalam sesi (total semua game)<br>
+      2. Pemain dengan menang terbanyak = <strong>Raja Meja 👑 (+3)</strong><br>
+      3. Pemain menang ≥ 2 game (bukan terbanyak) = <strong>Nyaris Sempurna 😤 (+2)</strong><br>
+      4. Pemain menang 1 game = <strong>Cari Jodoh 😏 (+1)</strong> · Menang 0 game = <strong>Penonton Setia ⬜ (+1)</strong><br>
+      5. Jika seri (2 pemain menang sama banyak) → keduanya dapat poin posisi tersebut<br>
+      <strong>Bonus:</strong> Streak Raja Meja 3 sesi berturut = <strong>+2</strong> · Hadir 4 sesi/bulan = <strong>+3</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ LEADERBOARD ═══════════ -->
+<div id="page-leaderboard" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Leaderboard</div><div class="page-sub">GSBSD Mahjong Community · Update otomatis tiap sesi dicatat</div></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print/PDF</button><button class="btn btn-ghost btn-sm">📤 Share</button></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'tab-bulan')">Bulan Ini</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-alltime')">All-Time</button>
+    <button class="tab-btn" onclick="switchTab(this,'tab-streak')">Streak 🔥</button>
+  </div>
+  <div id="tab-bulan" class="tab-content active">
+    <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="month-btn active">Juni 2026</button>
+      <button class="month-btn">Mei 2026</button>
+      <button class="month-btn">April 2026</button>
+    </div>
+    <div class="podium">
+      <div class="podium-slot p2"><div class="podium-avatar">R</div><div class="podium-name">Rina W.</div><div class="podium-pts">24</div><div class="podium-plinth">2</div></div>
+      <div class="podium-slot p1"><div class="podium-avatar"><span class="crown">👑</span>A</div><div class="podium-name">Ahmad S.</div><div class="podium-pts">38</div><div class="podium-plinth">1</div></div>
+      <div class="podium-slot p3"><div class="podium-avatar">B</div><div class="podium-name">Budi H.</div><div class="podium-pts">19</div><div class="podium-plinth">3</div></div>
+    </div>
+    <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Poin</th><th>Raja Meja 👑</th><th>Sesi</th><th>Win%</th><th>Streak</th><th>Tier</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div></div>
+  </div>
+  <div id="tab-alltime" class="tab-content">
+    <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Total Poin</th><th>Raja Meja 👑</th><th>Sesi</th><th>Win%</th><th>Tier</th><th>Progress</th></tr></thead><tbody id="alltime-body"></tbody></table></div></div>
+  </div>
+  <div id="tab-streak" class="tab-content">
+    <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Streak Juara Aktif</th><th>Best Streak</th></tr></thead><tbody>
+      <tr><td><span class="rank-num rank-1">1</span></td><td><div class="player-info"><div class="player-avatar" style="background:#4a3a1a;color:#FFD700">A</div><div class="player-name">Ahmad S.</div></div></td><td>🔥🔥🔥 3 sesi berturut</td><td>5×</td></tr>
+      <tr><td><span class="rank-num rank-2">2</span></td><td><div class="player-info"><div class="player-avatar" style="background:#1a3a2a;color:#2ecc71">R</div><div class="player-name">Rina W.</div></div></td><td>🔥🔥 2 sesi berturut</td><td>4×</td></tr>
+      <tr><td><span class="rank-num rank-3">3</span></td><td><div class="player-info"><div class="player-avatar" style="background:#1a2a3a;color:#3498db">B</div><div class="player-name">Budi H.</div></div></td><td>🔥 1 sesi</td><td>3×</td></tr>
+    </tbody></table></div></div>
+  </div>
+</div>
+
+<!-- ═══════════ CATAT SESI A+ ═══════════ -->
+<div id="page-session" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Catat Sesi Mabar</div><div class="page-sub">Sistem A+ Simple+ — input jumlah kemenangan tiap pemain</div></div>
+  </div>
+
+  <div class="info-box">
+    <strong>📋 Cara Mengisi:</strong>
+    Pilih pemain di tiap slot, lalu isi angka <strong>berapa kali pemain itu menang game</strong> dalam sesi ini.
+    Sistem akan otomatis menentukan posisi dan poin komunitas.<br>
+    <strong>Poin Posisi:</strong> 👑 Raja Meja (menang terbanyak) <strong>+3</strong> · 😤 Nyaris Sempurna (≥2 menang) <strong>+2</strong> · 😏 Cari Jodoh (1 menang) <strong>+1</strong> · ⬜ Penonton Setia (0 menang) <strong>+1</strong>
+  </div>
+
+  <!-- Konfigurasi Sesi -->
+  <div class="session-config">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">⚙️ Konfigurasi Sesi</div>
+    <div class="config-grid">
+      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" id="sesi-tgl" value="2026-06-28"></div>
+      <div class="form-group"><label class="form-label">Durasi (jam)</label><input type="number" class="form-input" id="sesi-dur" value="2" min="1" max="12"></div>
+      <div class="form-group">
+        <label class="form-label">Jumlah Meja</label>
+        <select class="form-select" id="sesi-meja" onchange="buildMeja()">
+          <option value="1">1 Meja (4 pemain)</option>
+          <option value="2" selected>2 Meja (8 pemain)</option>
+          <option value="3">3 Meja (12 pemain)</option>
+          <option value="4">4 Meja (16 pemain)</option>
+          <option value="5">5 Meja (20 pemain)</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Catatan</label><input type="text" class="form-input" id="sesi-note" placeholder="Contoh: Sesi rutin Sabtu"></div>
+    </div>
+  </div>
+
+  <!-- Meja Container -->
+  <div id="meja-container"></div>
+
+  <!-- Submit -->
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+    <button type="button" class="btn btn-ghost" onclick="resetSession()">↺ Reset</button>
+    <button type="button" class="btn btn-primary" onclick="submitSession()">💾 Simpan & Update Poin</button>
+  </div>
+</div>
+
+<!-- ═══════════ PEMAIN ═══════════ -->
+<div id="page-players" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Data Pemain</div><div class="page-sub">Tier otomatis dari poin all-time · Decay jika absen 2 bulan</div></div>
+    <button class="btn btn-primary btn-sm" onclick="openModal('modal-player')">+ Tambah Pemain</button>
+  </div>
+  <div class="tier-journey">
+    <div class="tj-item"><span class="tier-badge tier-c">Tier C</span><div class="tj-pts" style="color:var(--muted)">0 – 19</div><div class="tj-label" style="color:var(--muted);font-weight:700">Si Baru Belajar 👀</div><div class="tj-sesi" style="color:var(--muted)">≈ 3–4 sesi untuk naik</div></div>
+    <div class="tj-item"><span class="tier-badge tier-b">Tier B</span><div class="tj-pts" style="color:#2ecc71">20 – 54</div><div class="tj-label" style="color:#2ecc71;font-weight:700">Jagoan Pong 🀄</div><div class="tj-sesi" style="color:var(--muted)">≈ 4–6 sesi lagi</div></div>
+    <div class="tj-item"><span class="tier-badge tier-a">Tier A</span><div class="tj-pts" style="color:var(--gold)">55 – 109</div><div class="tj-label" style="color:var(--gold);font-weight:700">Si Tangan Dingin 🧊</div><div class="tj-sesi" style="color:var(--muted)">≈ 10–14 sesi lagi</div></div>
+    <div class="tj-item"><span class="tier-badge tier-s">Tier S</span><div class="tj-pts" style="color:#FFD700">110+</div><div class="tj-label" style="color:#FFD700;font-weight:700">Dewa Mahjong 👑</div><div class="tj-sesi" style="color:var(--muted)">≈ 20+ sesi lagi</div></div>
+  </div>
+  <div class="card">
+    <div style="padding:11px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+      <div style="position:relative;flex:1;min-width:180px">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none">🔍</span>
+        <input type="text" class="form-input" id="player-search" placeholder="Cari nama atau nomor WA..." style="padding-left:32px" oninput="renderPlayers()">
+      </div>
+      <select class="form-select" style="width:auto" id="filter-status" onchange="renderPlayers()"><option value="">Semua Status</option><option>Aktif</option><option>Tidak Aktif</option><option>Alumni</option></select>
+      <select class="form-select" style="width:auto" id="filter-tier" onchange="renderPlayers()"><option value="">Semua Tier</option><option value="S">Tier S</option><option value="A">Tier A</option><option value="B">Tier B</option><option value="C">Tier C</option></select>
+    </div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Pemain</th><th>No. WA</th><th>Bergabung</th><th>Poin</th><th>Sesi</th><th>Tier</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="players-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══════════ RIWAYAT ═══════════ -->
+<div id="page-history" class="page">
+  <div class="page-header"><div><div class="page-title">Riwayat Sesi</div><div class="page-sub">Klik Edit untuk koreksi hasil & poin pemain</div></div><button class="btn btn-ghost btn-sm">Export CSV</button></div>
+  <div class="notice-box" style="margin-bottom:16px;background:rgba(201,147,58,.07);border:1px solid rgba(201,147,58,.2);border-radius:8px;padding:11px 14px;font-size:12px;color:var(--text)">
+    ✏️ <strong style="color:var(--gold)">Edit Sesi:</strong> Klik tombol Edit pada sesi yang ingin dikoreksi. Sistem akan recalculate poin semua pemain di sesi tersebut dan update leaderboard otomatis. Setiap perubahan dicatat di log.
+  </div>
+  <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>Sesi</th><th>Tanggal</th><th>Meja</th><th>Durasi</th><th>Pemain</th><th>Game</th><th>Poin Dibagi</th><th>Log</th><th>Aksi</th></tr></thead><tbody id="history-body"></tbody></table></div></div>
+</div>
+
+<!-- ═══════════ KAS ═══════════ -->
+<div id="page-kas" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Kas Komunitas</div><div class="page-sub">Arus kas & alokasi dana · Juni 2026</div></div>
+    <div style="display:flex;gap:7px"><button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-kas')">+ Transaksi</button></div>
+  </div>
+  <div class="kas-summary">
+    <div class="kas-card"><div class="stat-label">Pemasukan</div><div class="kas-amount kas-in">Rp 2.440.000</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Juni 2026</div></div>
+    <div class="kas-card"><div class="stat-label">Pengeluaran</div><div class="kas-amount kas-out">Rp 1.200.000</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Juni 2026</div></div>
+    <div class="kas-card"><div class="stat-label">Saldo Bersih</div><div class="kas-amount kas-net">Rp 1.240.000</div><div style="font-size:11px;color:var(--gold);margin-top:3px">Hadiah: Rp 496.000</div></div>
+  </div>
+  <div class="card card-pad" style="margin-bottom:16px">
+    <div class="section-title" style="margin-bottom:11px">Alokasi Saldo</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🏆 Hadiah (40%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#FFD700">Rp 496.000</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🏦 Cadangan (30%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--green)">Rp 372.000</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">⚙️ Operasional (20%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700">Rp 248.000</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🎁 Mingguan (10%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--purple)">Rp 124.000</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <span style="font-size:11px;color:var(--muted)">📅</span>
+      <button class="month-btn active" onclick="filterKas('Juni 2026',this)">Juni 2026</button>
+      <button class="month-btn" onclick="filterKas('Mei 2026',this)">Mei 2026</button>
+      <button class="month-btn" onclick="filterKas('April 2026',this)">April 2026</button>
+      <button class="month-btn" onclick="filterKas('all',this)">Semua</button>
+      <span style="flex:1"></span>
+      <select class="form-select" style="width:auto;font-size:12px;padding:4px 9px" onchange="filterKasType(this.value)"><option value="">Semua</option><option value="in">Masuk</option><option value="out">Keluar</option></select>
+    </div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Tanggal</th><th>Keterangan</th><th>Kategori</th><th>Tipe</th><th>Jumlah</th><th>Saldo</th></tr></thead><tbody id="kas-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══════════ SETTINGS ═══════════ -->
+<div id="page-settings" class="page">
+  <div class="page-header"><div><div class="page-title">Pengaturan</div><div class="page-sub">Konfigurasi sistem poin, tier, dan komunitas</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card card-pad">
+      <div class="section-title" style="margin-bottom:14px">Sistem Poin A+</div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Raja Meja 👑 (menang terbanyak)</label><input type="number" class="form-input" value="3"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Nyaris Sempurna 😤 (≥ 2 menang)</label><input type="number" class="form-input" value="2"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Cari Jodoh 😏 / Penonton Setia ⬜ (0-1 menang)</label><input type="number" class="form-input" value="1"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Batas Runner-up (menang ≥ X game)</label><input type="number" class="form-input" value="2"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Bonus Streak Juara (3 sesi berturut)</label><input type="number" class="form-input" value="2"></div>
+      <div class="form-group" style="margin-bottom:14px"><label class="form-label">Bonus Kehadiran Rutin (4 sesi/bulan)</label><input type="number" class="form-input" value="3"></div>
+      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Sistem poin disimpan')">Simpan</button>
+    </div>
+    <div class="card card-pad">
+      <div class="section-title" style="margin-bottom:14px">Batas Tier</div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">👑 Dewa Mahjong · Tier S (min poin)</label><input type="number" class="form-input" value="110"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">🧊 Si Tangan Dingin · Tier A (min poin)</label><input type="number" class="form-input" value="55"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">🀄 Jagoan Pong · Tier B (min poin)</label><input type="number" class="form-input" value="20"></div>
+      <div class="form-group" style="margin-bottom:14px"><label class="form-label">👀 Si Baru Belajar · Tier C (default)</label><input type="number" class="form-input" value="0" disabled></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Decay setelah absen (bulan)</label><input type="number" class="form-input" value="2"></div>
+      <div class="form-group" style="margin-bottom:14px"><label class="form-label">Turun tier sebanyak (level)</label><input type="number" class="form-input" value="1"></div>
+      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Batas tier disimpan')">Simpan</button>
+    </div>
+    <div class="card card-pad">
+      <div class="section-title" style="margin-bottom:14px">Alokasi Kas (%)</div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Dana Hadiah</label><input type="number" class="form-input" value="40"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Kas Cadangan</label><input type="number" class="form-input" value="30"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Operasional</label><input type="number" class="form-input" value="20"></div>
+      <div class="form-group" style="margin-bottom:14px"><label class="form-label">Hadiah Mingguan</label><input type="number" class="form-input" value="10"></div>
+      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Alokasi kas disimpan')">Simpan</button>
+    </div>
+    <div class="card card-pad">
+      <div class="section-title" style="margin-bottom:14px">Info Komunitas</div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Nama Komunitas</label><input type="text" class="form-input" value="GSBSD Mahjong Community"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Singkatan / ID</label><input type="text" class="form-input" value="GMC"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Nama Host</label><input type="text" class="form-input" value="Koben"></div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Harga Sewa/Jam (Rp)</label><input type="number" class="form-input" value="65000"></div>
+      <div class="form-group" style="margin-bottom:14px"><label class="form-label">Paket 10 Jam (Rp)</label><input type="number" class="form-input" value="500000"></div>
+      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Info komunitas disimpan')">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ RULES MAHJONG ═══════════ -->
+<div id="page-rules" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Rules Mahjong</div><div class="page-sub">Panduan bermain Mahjong Hong Kong Basic — GSBSD Mahjong Community</div></div>
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print Panduan</button>
+  </div>
+
+  <!-- ══ KNOW YOUR TILES BOARD ══ -->
+  <div style="background:linear-gradient(135deg,#c8d8a0 0%,#b8cc8a 100%);border:3px solid #8aaa50;border-radius:16px;padding:20px 16px;margin-bottom:22px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="display:inline-block;background:#f5f0e0;border:2px solid #333;border-radius:4px;padding:8px 24px;margin-bottom:4px">
+        <div style="font-family:'Noto Serif SC',serif;font-size:17px;font-weight:900;color:#1a1208;letter-spacing:.04em;line-height:1.3">KNOW YOUR TILES<br><span style="font-size:13px">Panduan Tile Mahjong — GMC</span></div>
+      </div>
+    </div>
+
+    <!-- Row label helper -->
+    <!-- CHARACTER (WINDS + DRAGONS + BLANK) -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:70px;flex-shrink:0;font-style:italic;font-size:13px;font-weight:700;color:#1a3a0a;text-align:right">Character</div>
+      <div style="display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">
+        <!-- East 東 -->
+        <div class="rt"><div class="rt-top rt-b">東</div><div class="rt-bot rt-b" style="font-size:7px;color:#888">東</div></div>
+        <!-- South 南 -->
+        <div class="rt"><div class="rt-top rt-b">南</div><div class="rt-bot rt-b" style="font-size:7px;color:#888">南</div></div>
+        <!-- West 西 -->
+        <div class="rt"><div class="rt-top rt-b">西</div><div class="rt-bot rt-b" style="font-size:7px;color:#888">西</div></div>
+        <!-- North 北 -->
+        <div class="rt"><div class="rt-top rt-b">北</div><div class="rt-bot rt-b" style="font-size:7px;color:#888">北</div></div>
+        <!-- Zhong 中 red dragon -->
+        <div class="rt"><div class="rt-top" style="color:#c0392b;font-size:20px;font-family:'Noto Serif SC',serif;font-weight:900">中</div><div class="rt-bot" style="color:#c0392b;font-size:7px">中</div></div>
+        <!-- Fa 發 green dragon -->
+        <div class="rt"><div class="rt-top" style="color:#27ae60;font-size:20px;font-family:'Noto Serif SC',serif;font-weight:900">發</div><div class="rt-bot" style="color:#27ae60;font-size:7px">發</div></div>
+        <!-- Blank white dragon -->
+        <div class="rt"><div style="width:28px;height:20px;border:2px solid #555;border-radius:3px;margin:4px auto"></div><div class="rt-bot" style="color:#aaa;font-size:7px">白</div></div>
+      </div>
+    </div>
+
+    <!-- FLOWER -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:70px;flex-shrink:0;font-style:italic;font-size:13px;font-weight:700;color:#1a3a0a;text-align:right">Flower</div>
+      <div style="display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">
+        <!-- Spring 春 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#c0392b;line-height:1">1<br><span style="font-family:'Noto Serif SC',serif">春</span></div>
+          <div style="font-size:16px;margin-top:8px">🌸</div>
+        </div>
+        <!-- Summer 夏 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#c0392b;line-height:1">2<br><span style="font-family:'Noto Serif SC',serif">夏</span></div>
+          <div style="font-size:16px;margin-top:8px">🌺</div>
+        </div>
+        <!-- Autumn 秋 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#c0392b;line-height:1">3<br><span style="font-family:'Noto Serif SC',serif">秋</span></div>
+          <div style="font-size:16px;margin-top:8px">🍁</div>
+        </div>
+        <!-- Winter 冬 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#c0392b;line-height:1">4<br><span style="font-family:'Noto Serif SC',serif">冬</span></div>
+          <div style="font-size:16px;margin-top:8px">❄️</div>
+        </div>
+        <!-- Plum 梅 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#27ae60;line-height:1">梅<br><span style="color:#333">1</span></div>
+          <div style="font-size:16px;margin-top:8px">🌸</div>
+        </div>
+        <!-- Orchid 蘭 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#27ae60;line-height:1">蘭<br><span style="color:#333">2</span></div>
+          <div style="font-size:16px;margin-top:8px">🌿</div>
+        </div>
+        <!-- Chrysanthemum 菊 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#27ae60;line-height:1">菊<br><span style="color:#333">3</span></div>
+          <div style="font-size:16px;margin-top:8px">🌼</div>
+        </div>
+        <!-- Bamboo 竹 -->
+        <div class="rt" style="position:relative">
+          <div style="position:absolute;top:2px;left:3px;font-size:8px;font-weight:700;color:#27ae60;line-height:1">竹<br><span style="color:#333">4</span></div>
+          <div style="font-size:16px;margin-top:8px">🎋</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#2a4a10;line-height:1.5;font-style:italic">Bonus tile<br>langsung<br>ambil ulang</div>
+    </div>
+
+    <!-- TEN THOUSAND / WAN 萬 -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:70px;flex-shrink:0;font-style:italic;font-size:13px;font-weight:700;color:#1a3a0a;text-align:right;line-height:1.3">Ten<br>thousand</div>
+      <div style="display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">一</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">二</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">三</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">四</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top" style="color:#c0392b;font-size:17px;font-family:'Noto Serif SC',serif;font-weight:900">伍</div><div class="rt-mid-wan" style="color:#c0392b">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">六</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">七</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">八</div><div class="rt-mid-wan">萬</div></div>
+        <div class="rt"><div class="rt-top rt-b" style="font-size:17px">九</div><div class="rt-mid-wan">萬</div></div>
+      </div>
+    </div>
+
+    <!-- CYLINDER / DOTS / TONG 筒 -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:70px;flex-shrink:0;font-style:italic;font-size:13px;font-weight:700;color:#1a3a0a;text-align:right">Cylinder</div>
+      <div style="display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">
+        <!-- 1 dot: large circle -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="18" cy="22" r="13" fill="none" stroke="#c0392b" stroke-width="3"/><circle cx="18" cy="22" r="7" fill="#c0392b"/></svg></div>
+        <!-- 2 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="11" cy="16" r="6" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="11" cy="16" r="3" fill="#27ae60"/><circle cx="25" cy="28" r="6" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="25" cy="28" r="3" fill="#27ae60"/></svg></div>
+        <!-- 3 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="18" cy="10" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="18" cy="10" r="2.5" fill="#27ae60"/><circle cx="10" cy="26" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="10" cy="26" r="2.5" fill="#27ae60"/><circle cx="26" cy="26" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="26" cy="26" r="2.5" fill="#27ae60"/></svg></div>
+        <!-- 4 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="11" cy="13" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="11" cy="13" r="2.5" fill="#27ae60"/><circle cx="25" cy="13" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="25" cy="13" r="2.5" fill="#27ae60"/><circle cx="11" cy="31" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="11" cy="31" r="2.5" fill="#27ae60"/><circle cx="25" cy="31" r="5" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="25" cy="31" r="2.5" fill="#27ae60"/></svg></div>
+        <!-- 5 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="10" cy="11" r="4.5" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="10" cy="11" r="2" fill="#c0392b"/><circle cx="26" cy="11" r="4.5" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="26" cy="11" r="2" fill="#c0392b"/><circle cx="18" cy="22" r="4.5" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="18" cy="22" r="2" fill="#c0392b"/><circle cx="10" cy="33" r="4.5" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="10" cy="33" r="2" fill="#c0392b"/><circle cx="26" cy="33" r="4.5" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="26" cy="33" r="2" fill="#c0392b"/></svg></div>
+        <!-- 6 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="10" cy="12" r="4" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="10" cy="12" r="2" fill="#27ae60"/><circle cx="26" cy="12" r="4" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="26" cy="12" r="2" fill="#c0392b"/><circle cx="10" cy="22" r="4" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="10" cy="22" r="2" fill="#27ae60"/><circle cx="26" cy="22" r="4" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="26" cy="22" r="2" fill="#c0392b"/><circle cx="10" cy="32" r="4" fill="none" stroke="#27ae60" stroke-width="2"/><circle cx="10" cy="32" r="2" fill="#27ae60"/><circle cx="26" cy="32" r="4" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="26" cy="32" r="2" fill="#c0392b"/></svg></div>
+        <!-- 7 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="9" cy="10" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="9" cy="10" r="1.8" fill="#27ae60"/><circle cx="27" cy="10" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="27" cy="10" r="1.8" fill="#27ae60"/><circle cx="9" cy="21" r="3.5" fill="none" stroke="#c0392b" stroke-width="1.5"/><circle cx="9" cy="21" r="1.8" fill="#c0392b"/><circle cx="27" cy="21" r="3.5" fill="none" stroke="#c0392b" stroke-width="1.5"/><circle cx="27" cy="21" r="1.8" fill="#c0392b"/><circle cx="9" cy="33" r="3.5" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="9" cy="33" r="1.8" fill="#1a5a9a"/><circle cx="27" cy="33" r="3.5" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="27" cy="33" r="1.8" fill="#1a5a9a"/><circle cx="18" cy="27" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="18" cy="27" r="1.8" fill="#27ae60"/></svg></div>
+        <!-- 8 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="9" cy="9" r="3.5" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="9" cy="9" r="1.8" fill="#1a5a9a"/><circle cx="27" cy="9" r="3.5" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="27" cy="9" r="1.8" fill="#1a5a9a"/><circle cx="9" cy="19" r="3.5" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="9" cy="19" r="1.8" fill="#1a5a9a"/><circle cx="27" cy="19" r="3.5" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="27" cy="19" r="1.8" fill="#1a5a9a"/><circle cx="9" cy="29" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="9" cy="29" r="1.8" fill="#27ae60"/><circle cx="27" cy="29" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="27" cy="29" r="1.8" fill="#27ae60"/><circle cx="9" cy="39" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="9" cy="39" r="1.8" fill="#27ae60"/><circle cx="27" cy="39" r="3.5" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="27" cy="39" r="1.8" fill="#27ae60"/></svg></div>
+        <!-- 9 dots -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><circle cx="9" cy="8" r="3" fill="none" stroke="#c0392b" stroke-width="1.5"/><circle cx="9" cy="8" r="1.5" fill="#c0392b"/><circle cx="18" cy="8" r="3" fill="none" stroke="#c0392b" stroke-width="1.5"/><circle cx="18" cy="8" r="1.5" fill="#c0392b"/><circle cx="27" cy="8" r="3" fill="none" stroke="#c0392b" stroke-width="1.5"/><circle cx="27" cy="8" r="1.5" fill="#c0392b"/><circle cx="9" cy="20" r="3" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="9" cy="20" r="1.5" fill="#1a5a9a"/><circle cx="18" cy="20" r="3" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="18" cy="20" r="1.5" fill="#1a5a9a"/><circle cx="27" cy="20" r="3" fill="none" stroke="#1a5a9a" stroke-width="1.5"/><circle cx="27" cy="20" r="1.5" fill="#1a5a9a"/><circle cx="9" cy="32" r="3" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="9" cy="32" r="1.5" fill="#27ae60"/><circle cx="18" cy="32" r="3" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="18" cy="32" r="1.5" fill="#27ae60"/><circle cx="27" cy="32" r="3" fill="none" stroke="#27ae60" stroke-width="1.5"/><circle cx="27" cy="32" r="1.5" fill="#27ae60"/></svg></div>
+      </div>
+    </div>
+
+    <!-- STRIP / BAMBOO / TIAO 條 -->
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:70px;flex-shrink:0;font-style:italic;font-size:13px;font-weight:700;color:#1a3a0a;text-align:right">Strip</div>
+      <div style="display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">
+        <!-- 1 strip: bird -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><text x="18" y="28" text-anchor="middle" font-size="22">🐦</text><line x1="18" y1="35" x2="18" y2="43" stroke="#c0392b" stroke-width="2.5"/></svg></div>
+        <!-- 2 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="11" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/><rect x="20" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/></svg></div>
+        <!-- 3 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="6" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/><rect x="15" y="6" width="5" height="32" rx="2.5" fill="#c0392b"/><rect x="24" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/></svg></div>
+        <!-- 4 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="4" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/><rect x="11" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/><rect x="18" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/><rect x="25" y="6" width="5" height="32" rx="2.5" fill="#27ae60"/></svg></div>
+        <!-- 5 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="2" y="6" width="4" height="32" rx="2" fill="#27ae60"/><rect x="8" y="6" width="4" height="32" rx="2" fill="#27ae60"/><rect x="14" y="6" width="4" height="32" rx="2" fill="#c0392b"/><rect x="20" y="6" width="4" height="32" rx="2" fill="#27ae60"/><rect x="26" y="6" width="4" height="32" rx="2" fill="#27ae60"/></svg></div>
+        <!-- 6 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="3" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="9" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="15" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="3" y="23" width="4" height="17" rx="2" fill="#27ae60"/><rect x="9" y="23" width="4" height="17" rx="2" fill="#27ae60"/><rect x="15" y="23" width="4" height="17" rx="2" fill="#27ae60"/></svg></div>
+        <!-- 7 strips — snake shape -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><path d="M8 6 Q18 14 28 6" stroke="#27ae60" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M8 18 Q18 26 28 18" stroke="#27ae60" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M8 30 Q18 38 28 30" stroke="#27ae60" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="9" y="12" width="3" height="14" rx="1.5" fill="#27ae60"/><rect x="23" y="12" width="3" height="14" rx="1.5" fill="#27ae60"/></svg></div>
+        <!-- 8 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="2" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="8" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="14" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="20" y="4" width="4" height="17" rx="2" fill="#27ae60"/><rect x="2" y="23" width="4" height="17" rx="2" fill="#27ae60"/><rect x="8" y="23" width="4" height="17" rx="2" fill="#27ae60"/><rect x="14" y="23" width="4" height="17" rx="2" fill="#27ae60"/><rect x="20" y="23" width="4" height="17" rx="2" fill="#27ae60"/></svg></div>
+        <!-- 9 strips -->
+        <div class="rt"><svg width="36" height="44" viewBox="0 0 36 44"><rect x="1" y="4" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="6" y="4" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="11" y="4" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="16" y="4" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="21" y="4" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="1" y="23" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="6" y="23" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="11" y="23" width="3.5" height="17" rx="1.7" fill="#27ae60"/><rect x="16" y="23" width="3.5" height="17" rx="1.7" fill="#27ae60"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HOW TO WIN BOARD ══ -->
+  <div style="background:linear-gradient(135deg,#1a2e1a 0%,#142614 50%,#0e1e0e 100%);border:2px solid #4a7a3a;border-radius:14px;padding:20px 18px;margin-bottom:22px;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden">
+
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:900;color:#f5e6a3;letter-spacing:.04em;text-shadow:0 2px 8px rgba(0,0,0,.5)">HOW TO WIN</div>
+    </div>
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;color:rgba(245,230,163,.7);letter-spacing:.02em">UNTUK MENANG: <span style="color:#f5e6a3;font-weight:700">4 Set (CHI / PONG / KONG) + 1 Pasang (Mata)</span></div>
+    </div>
+
+    <!-- 2x2 grid — lebih proporsional -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+
+      <!-- CHI -->
+      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(74,122,58,.4);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:center">
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:900;color:#f5e6a3;margin-bottom:2px">CHI</div>
+          <div style="font-size:9px;color:rgba(245,230,163,.5);margin-bottom:8px;letter-spacing:.04em">順子 Urutan</div>
+          <div style="display:flex;gap:3px;justify-content:center">
+            <div class="hw-tile">七<span class="hw-b">萬</span></div>
+            <div class="hw-tile">八<span class="hw-b">萬</span></div>
+            <div class="hw-tile hw-r">九<span class="hw-b" style="color:#c0392b">萬</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(245,230,163,.75);line-height:1.65;flex:1">
+          <span style="color:#f5e6a3;font-weight:700">3 tile berurutan</span> dari suit yang sama.<br>
+          Contoh: 7-8-9 Wan, 3-4-5 Tiao.<br>
+          Klaim dari pemain <span style="color:#FFD700">kiri saja</span>.
+        </div>
+      </div>
+
+      <!-- PONG -->
+      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(74,122,58,.4);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:center">
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:900;color:#f5e6a3;margin-bottom:2px">PONG</div>
+          <div style="font-size:9px;color:rgba(245,230,163,.5);margin-bottom:8px;letter-spacing:.04em">刻子 Triplet</div>
+          <div style="display:flex;gap:3px;justify-content:center">
+            <div class="hw-tile hw-g">南<span class="hw-b" style="color:#27ae60">風</span></div>
+            <div class="hw-tile hw-g">南<span class="hw-b" style="color:#27ae60">風</span></div>
+            <div class="hw-tile hw-g">南<span class="hw-b" style="color:#27ae60">風</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(245,230,163,.75);line-height:1.65;flex:1">
+          <span style="color:#f5e6a3;font-weight:700">3 tile identik.</span><br>
+          Contoh: 3x Angin Selatan,<br>3x Naga Merah (中中中).<br>
+          Klaim dari pemain <span style="color:#FFD700">siapa saja</span>.
+        </div>
+      </div>
+
+      <!-- KONG -->
+      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(74,122,58,.4);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:center">
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:900;color:#f5e6a3;margin-bottom:2px">KONG</div>
+          <div style="font-size:9px;color:rgba(245,230,163,.5);margin-bottom:8px;letter-spacing:.04em">槓子 Quad</div>
+          <div style="display:flex;gap:3px;justify-content:center">
+            <div class="hw-tile hw-g">南<span class="hw-b" style="color:#27ae60">風</span></div>
+            <div class="hw-tile hw-g">南<span class="hw-b" style="color:#27ae60">風</span></div>
+            <div class="hw-tile hw-g">南<span class="hw-b" style="color:#27ae60">風</span></div>
+            <div class="hw-tile" style="background:linear-gradient(145deg,#2a2a2a,#1a1a1a);color:white;font-size:15px;border-color:#555">🀫</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(245,230,163,.75);line-height:1.65;flex:1">
+          <span style="color:#f5e6a3;font-weight:700">4 tile identik.</span><br>
+          Setelah Kong, ambil 1 tile<br>bonus dari belakang tembok.<br>
+          <span style="color:#FFD700">Terbuka</span> atau <span style="color:#FFD700">tertutup</span>.
+        </div>
+      </div>
+
+      <!-- PAIR / MATA -->
+      <div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,215,0,.25);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:center">
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-family:'Noto Serif SC',serif;font-size:16px;font-weight:900;color:#FFD700;margin-bottom:2px">PAIR</div>
+          <div style="font-size:9px;color:rgba(245,230,163,.5);margin-bottom:8px;letter-spacing:.04em">雀頭 Mata</div>
+          <div style="display:flex;gap:3px;justify-content:center">
+            <div class="hw-tile hw-r">中<span class="hw-b" style="color:#c0392b">龍</span></div>
+            <div class="hw-tile hw-r">中<span class="hw-b" style="color:#c0392b">龍</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(245,230,163,.75);line-height:1.65;flex:1">
+          <span style="color:#FFD700;font-weight:700">2 tile identik</span> — kepala tangan.<br>
+          Wajib ada tepat <span style="color:#FFD700">1 pair</span> di setiap tangan menang.<br>
+          <span style="color:rgba(245,230,163,.5)">Tidak bisa diklaim dari buangan.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formula bar -->
+    <div style="background:rgba(0,0,0,.3);border:1px solid rgba(255,215,0,.2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:11px;color:rgba(245,230,163,.6)">Tangan menang =</span>
+      <span style="background:rgba(74,122,58,.3);border:1px solid rgba(74,122,58,.5);border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;color:#f5e6a3">CHI / PONG / KONG × 4</span>
+      <span style="color:rgba(245,230,163,.5);font-size:18px;font-weight:300">+</span>
+      <span style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;color:#FFD700">PAIR × 1</span>
+      <span style="color:rgba(245,230,163,.5);font-size:18px;font-weight:300">=</span>
+      <span style="background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.5);border-radius:5px;padding:5px 14px;font-size:13px;font-weight:900;color:#FFD700">🀄 MAHJONG!</span>
+    </div>
+  </div>
+
+  <!-- ══ ALUR & TIPS ══ -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+
+    <!-- Alur permainan -->
+    <div class="card card-pad">
+      <div class="rules-h2" style="margin-bottom:14px;font-size:15px">🔄 Alur Permainan</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0f0e0d;flex-shrink:0">1</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--text)">Kocok & Bagi</div><div style="font-size:11px;color:var(--muted)">136 tile dikocok, tiap pemain mendapat 13 tile</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0f0e0d;flex-shrink:0">2</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--text)">Giliran Ambil & Buang</div><div style="font-size:11px;color:var(--muted)">Ambil 1 tile dari tembok, buang 1 tile tidak dibutuhkan</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0f0e0d;flex-shrink:0">3</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--text)">Klaim Tile Buangan</div><div style="font-size:11px;color:var(--muted)">Prioritas: Mahjong &gt; Kong &gt; Pong &gt; Chi (kiri saja)</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0f0e0d;flex-shrink:0">🏆</div>
+          <div><div style="font-size:12px;font-weight:700;color:#FFD700">MAHJONG!</div><div style="font-size:11px;color:var(--muted)">Tangan lengkap 4 set + 1 pair = menang ronde</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="card card-pad">
+      <div class="rules-h2" style="margin-bottom:14px;font-size:15px">💡 Tips Pemula</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--green);flex-shrink:0">✓</span><span style="color:var(--text)">Fokus 1 strategi — semua Chi atau semua Pong</span></div>
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--green);flex-shrink:0">✓</span><span style="color:var(--text)">Simpan Naga & Angin jika sudah punya 2 (incaran Pong)</span></div>
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--green);flex-shrink:0">✓</span><span style="color:var(--text)">Buang tile terisolasi (tidak punya pasangan) lebih awal</span></div>
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--green);flex-shrink:0">✓</span><span style="color:var(--text)">Perhatikan tile buangan lawan untuk tebak tangan mereka</span></div>
+        <div style="height:4px;border-top:1px solid var(--border);margin:4px 0"></div>
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--red);flex-shrink:0">✗</span><span style="color:var(--muted)">Jangan ubah strategi di tengah permainan</span></div>
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--red);flex-shrink:0">✗</span><span style="color:var(--muted)">Jangan buang tile yang sedang dicari lawan</span></div>
+        <div style="display:flex;gap:7px;font-size:12px"><span style="color:var(--red);flex-shrink:0">✗</span><span style="color:var(--muted)">Jangan tunggu tile "sempurna" jika tangan sudah hampir selesai</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- LOGOUT CONFIRM -->
+<div class="confirm-overlay" id="confirm-logout">
+  <div class="confirm-box" style="border-color:var(--border)">
+    <div class="confirm-title">Logout dari GMC?</div>
+    <div class="confirm-sub">Sesi host akan diakhiri. Semua data tersimpan aman di database.</div>
+    <div class="confirm-footer">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('confirm-logout').classList.remove('open')">Batal</button>
+      <button class="btn btn-danger btn-sm" onclick="doLogout()">Ya, Logout</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-edit-player">
+  <div class="modal">
+    <div class="modal-title">Edit Data Pemain</div><div class="modal-sub">Perubahan disimpan ke database</div>
+    <div class="form-grid-2">
+      <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" class="form-input" id="edit-fullname"></div>
+      <div class="form-group"><label class="form-label">Nama Panggilan</label><input type="text" class="form-input" id="edit-nickname"></div>
+      <div class="form-group"><label class="form-label">No. WhatsApp</label><input type="text" class="form-input" id="edit-wa"></div>
+      <div class="form-group"><label class="form-label">Bergabung</label><input type="date" class="form-input" id="edit-joined"></div>
+      <div class="form-group"><label class="form-label">Override Tier</label><select class="form-select" id="edit-tier"><option value="auto">Auto (dari poin)</option><option value="S">Tier S · Dewa Mahjong 👑</option><option value="A">Tier A · Si Tangan Dingin 🧊</option><option value="B">Tier B · Jagoan Pong 🀄</option><option value="C">Tier C · Si Baru Belajar 👀</option></select></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="edit-status"><option>Aktif</option><option>Tidak Aktif</option><option>Alumni</option></select></div>
+      <div class="form-group full"><label class="form-label">Catatan</label><input type="text" class="form-input" id="edit-notes"></div>
+    </div>
+    <div class="warn-box">⚠️ Poin hanya bisa diubah via <strong style="color:var(--text)">Catat Sesi</strong>.</div>
+    <div class="modal-footer"><button class="btn btn-danger btn-sm" onclick="closeModal('modal-edit-player')">Hapus</button><span style="flex:1"></span><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-edit-player')">Batal</button><button class="btn btn-primary btn-sm" onclick="closeModal('modal-edit-player');showToast('✓ Data pemain diperbarui!')">Simpan</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-player">
+  <div class="modal">
+    <div class="modal-title">Tambah Pemain Baru</div><div class="modal-sub">Member baru masuk Tier C (0 poin) secara default</div>
+    <div class="form-grid-2">
+      <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" class="form-input" placeholder="Nama pemain"></div>
+      <div class="form-group"><label class="form-label">Nama Panggilan</label><input type="text" class="form-input" placeholder="Tampil di leaderboard"></div>
+      <div class="form-group"><label class="form-label">No. WhatsApp</label><input type="text" class="form-input" placeholder="08xx..."></div>
+      <div class="form-group"><label class="form-label">Bergabung</label><input type="date" class="form-input" value="2026-06-28"></div>
+      <div class="form-group full"><label class="form-label">Catatan</label><input type="text" class="form-input" placeholder="Pemula / Berpengalaman / dll"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-player')">Batal</button><button class="btn btn-primary btn-sm" onclick="handleAddPlayer()">Daftarkan</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-kas">
+  <div class="modal">
+    <div class="modal-title">Tambah Transaksi Kas</div><div class="modal-sub">Catat pemasukan atau pengeluaran komunitas</div>
+    <div class="form-grid-2">
+      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" value="2026-06-28"></div>
+      <div class="form-group"><label class="form-label">Tipe</label><select class="form-select"><option>Pemasukan</option><option>Pengeluaran</option></select></div>
+      <div class="form-group"><label class="form-label">Kategori</label><select class="form-select"><option>Iuran Sesi</option><option>Iuran Member</option><option>Sewa Venue</option><option>Hadiah Mingguan</option><option>Hadiah Bulanan</option><option>Operasional</option><option>Lain-lain</option></select></div>
+      <div class="form-group"><label class="form-label">Jumlah (Rp)</label><input type="number" class="form-input" placeholder="0"></div>
+      <div class="form-group full"><label class="form-label">Keterangan</label><input type="text" class="form-input" placeholder="Contoh: Iuran sesi #9 - 8 pemain"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-kas')">Batal</button><button class="btn btn-primary btn-sm" onclick="handleSaveKas()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- Modal Edit Sesi -->
+<div class="modal-overlay" id="modal-edit-sesi">
+  <div class="modal" style="width:600px">
+    <div class="modal-title">Edit Sesi</div>
+    <div class="modal-sub" id="edit-sesi-sub">Koreksi hasil dan poin akan direcalculate otomatis</div>
+    <div class="form-grid-2" style="margin-bottom:16px">
+      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" id="edit-sesi-tgl"></div>
+      <div class="form-group"><label class="form-label">Durasi (jam)</label><input type="number" class="form-input" id="edit-sesi-dur" min="1" max="12"></div>
+      <div class="form-group full"><label class="form-label">Catatan</label><input type="text" class="form-input" id="edit-sesi-note"></div>
+    </div>
+    <div id="edit-sesi-meja-container"></div>
+    <div class="warn-box" style="margin-top:12px">⚠️ Menyimpan perubahan akan <strong style="color:var(--text)">recalculate poin</strong> semua pemain di sesi ini dan update leaderboard. Perubahan ini dicatat di log riwayat.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-edit-sesi')">Batal</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmEditSesi()">💾 Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div class="confirm-overlay" id="confirm-edit">
+  <div class="confirm-box">
+    <div class="confirm-title">⚠️ Konfirmasi Perubahan Poin</div>
+    <div class="confirm-sub" id="confirm-edit-text">Perubahan ini akan mengubah poin pemain dan update leaderboard. Tindakan ini dicatat di log. Lanjutkan?</div>
+    <div class="confirm-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeConfirm()">Batal</button>
+      <button class="btn btn-danger btn-sm" onclick="doEditSesi()">Ya, Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ganti Logo -->
+<div class="modal-overlay" id="modal-logo">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">Ganti Logo Komunitas</div>
+    <div class="modal-sub">Upload logo baru atau masukkan URL gambar</div>
+
+    <!-- Current logo preview -->
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:80px;height:80px;border-radius:14px;overflow:hidden;margin:0 auto 8px;border:2px solid var(--border);background:var(--surface)">
+        <img id="logo-preview-modal" src="https://design.canva.ai/48fi2WAxiIZjr5P" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="font-size:11px;color:var(--muted)">Preview logo saat ini</div>
+    </div>
+
+    <!-- Upload file -->
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="form-label">Upload File (JPG / PNG / SVG)</label>
+      <input type="file" accept="image/*" class="form-input" id="logo-file-input" onchange="previewLogoFile(this)" style="padding:6px">
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px">— atau —</div>
+
+    <!-- URL input -->
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">URL Gambar (dari Canva / Google Drive / dll)</label>
+      <input type="url" class="form-input" id="logo-url-input" placeholder="https://..." oninput="previewLogoURL(this.value)">
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">
+        💡 Logo Canva Koben: <a href="https://www.canva.com/d/462ECjMixhrLKDZ" target="_blank" style="color:var(--gold)">Buka di Canva →</a> lalu Share → Copy Link gambar
+      </div>
+    </div>
+
+    <!-- Info slot -->
+    <div style="background:rgba(201,147,58,.07);border:1px solid rgba(201,147,58,.2);border-radius:7px;padding:10px 13px;font-size:11px;color:var(--text);line-height:1.6;margin-bottom:4px">
+      ℹ️ Logo tersimpan di browser (localStorage). Untuk produksi, logo akan disimpan di Supabase dan sync ke semua perangkat.
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-logo')">Batal</button>
+      <button class="btn btn-danger btn-sm" onclick="resetLogo()">Reset Default</button>
+      <button class="btn btn-primary btn-sm" onclick="saveLogo()">💾 Simpan Logo</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── DATA PEMAIN (sorted A-Z) ──
+const players = [
+  {id:1,name:'Ahmad Setiawan',nick:'Ahmad S.',avatar:'A',color:'#4a3a1a',ac:'#FFD700',joined:'2026-01-10',wa:'081234567890',pts:38,wins:10,games:14,status:'Aktif',streak:3,notes:'Berpengalaman'},
+  {id:2,name:'Agus Riyanto',nick:'Agus R.',avatar:'Ag',color:'#1a3a1a',ac:'#8bc34a',joined:'2026-05-01',wa:'089012345678',pts:3,wins:0,games:3,status:'Aktif',streak:0,notes:'Pemula'},
+  {id:3,name:'Budi Hartono',nick:'Budi H.',avatar:'B',color:'#1a2a3a',ac:'#3498db',joined:'2026-02-01',wa:'083456789012',pts:19,wins:5,games:11,status:'Aktif',streak:1,notes:''},
+  {id:4,name:'Deni Kusuma',nick:'Deni K.',avatar:'D',color:'#2a3a1a',ac:'#8bc34a',joined:'2026-03-05',wa:'085678901234',pts:11,wins:3,games:9,status:'Aktif',streak:0,notes:''},
+  {id:5,name:'Dewi Cahyani',nick:'Dewi C.',avatar:'Dw',color:'#3a1a3a',ac:'#e91e63',joined:'2026-05-10',wa:'080123456789',pts:2,wins:0,games:2,status:'Aktif',streak:0,notes:'Pemula'},
+  {id:6,name:'Hendra Taufik',nick:'Hendra T.',avatar:'H',color:'#1a3a3a',ac:'#00bcd4',joined:'2026-04-01',wa:'087890123456',pts:6,wins:2,games:7,status:'Aktif',streak:0,notes:'Pemula'},
+  {id:7,name:'Lisa Permata',nick:'Lisa P.',avatar:'L',color:'#2a1a1a',ac:'#ff5722',joined:'2026-04-15',wa:'081345678901',pts:5,wins:1,games:5,status:'Aktif',streak:0,notes:''},
+  {id:8,name:'Maya Lestari',nick:'Maya L.',avatar:'M',color:'#2a1a3a',ac:'#9c27b0',joined:'2026-04-20',wa:'088901234567',pts:4,wins:1,games:5,status:'Tidak Aktif',streak:0,notes:''},
+  {id:9,name:'Putri Andini',nick:'Putri A.',avatar:'P',color:'#3a2a1a',ac:'#ff9800',joined:'2026-03-12',wa:'086789012345',pts:9,wins:2,games:8,status:'Aktif',streak:1,notes:''},
+  {id:10,name:'Rina Wulandari',nick:'Rina W.',avatar:'R',color:'#1a3a2a',ac:'#2ecc71',joined:'2026-01-15',wa:'082345678901',pts:24,wins:6,games:12,status:'Aktif',streak:2,notes:''},
+  {id:11,name:'Sari Dewi',nick:'Sari D.',avatar:'S',color:'#3a1a2a',ac:'#e91e63',joined:'2026-02-10',wa:'084567890123',pts:14,wins:4,games:10,status:'Aktif',streak:0,notes:'Pemula'},
+  {id:12,name:'Tono Jaya',nick:'Tono J.',avatar:'T',color:'#1a1a3a',ac:'#673ab7',joined:'2026-04-05',wa:'082456789012',pts:7,wins:2,games:6,status:'Aktif',streak:0,notes:''},
+].sort((a,b)=>a.nick.localeCompare(b.nick,'id'));
+
+const sesiData = [
+  {id:8,tgl:'2026-06-22',tglStr:'22 Jun 2026',dur:3,meja:2,pemain:8,note:'Sesi rutin Sabtu',edited:false,editLog:'',
+   hasil:[
+    {mejaNo:1,players:[{pid:1,wins:4},{pid:10,wins:3},{pid:3,wins:1},{pid:11,wins:0}]},
+    {mejaNo:2,players:[{pid:4,wins:3},{pid:6,wins:2},{pid:9,wins:1},{pid:7,wins:0}]}]},
+  {id:7,tgl:'2026-06-15',tglStr:'15 Jun 2026',dur:2,meja:2,pemain:8,note:'',edited:false,editLog:'',
+   hasil:[
+    {mejaNo:1,players:[{pid:10,wins:3},{pid:1,wins:2},{pid:11,wins:1},{pid:9,wins:0}]},
+    {mejaNo:2,players:[{pid:6,wins:2},{pid:4,wins:2},{pid:7,wins:1},{pid:8,wins:0}]}]},
+  {id:6,tgl:'2026-06-08',tglStr:'8 Jun 2026',dur:2,meja:1,pemain:4,note:'Sesi kecil',edited:true,editLog:'Diedit 10 Jun 2026',
+   hasil:[
+    {mejaNo:1,players:[{pid:1,wins:3},{pid:3,wins:2},{pid:10,wins:1},{pid:11,wins:0}]}]},
+  {id:5,tgl:'2026-06-01',tglStr:'1 Jun 2026',dur:3,meja:2,pemain:8,note:'',edited:false,editLog:'',
+   hasil:[
+    {mejaNo:1,players:[{pid:1,wins:4},{pid:10,wins:2},{pid:3,wins:1},{pid:9,wins:0}]},
+    {mejaNo:2,players:[{pid:4,wins:3},{pid:11,wins:2},{pid:6,wins:1},{pid:7,wins:0}]}]},
+];
+
+const kasData=[
+  {date:'28 Jun 2026',month:'Juni 2026',desc:'Iuran sesi #9 - 8 pemain',cat:'Iuran Sesi',type:'in',amt:320000,saldo:1240000},
+  {date:'28 Jun 2026',month:'Juni 2026',desc:'Sewa meja 2 jam x 2 meja',cat:'Sewa Venue',type:'out',amt:200000,saldo:920000},
+  {date:'22 Jun 2026',month:'Juni 2026',desc:'Iuran sesi #8 - 8 pemain',cat:'Iuran Sesi',type:'in',amt:320000,saldo:1120000},
+  {date:'22 Jun 2026',month:'Juni 2026',desc:'Sewa meja 3 jam x 2 meja',cat:'Sewa Venue',type:'out',amt:300000,saldo:800000},
+  {date:'15 Jun 2026',month:'Juni 2026',desc:'Iuran member bulk Juni',cat:'Iuran Member',type:'in',amt:600000,saldo:1100000},
+  {date:'10 Jun 2026',month:'Juni 2026',desc:'Hadiah mingguan sesi #7',cat:'Hadiah Mingguan',type:'out',amt:100000,saldo:500000},
+  {date:'25 Mei 2026',month:'Mei 2026',desc:'Iuran sesi #6',cat:'Iuran Sesi',type:'in',amt:320000,saldo:780000},
+  {date:'20 Mei 2026',month:'Mei 2026',desc:'Hadiah bulanan Mei',cat:'Hadiah Bulanan',type:'out',amt:300000,saldo:460000},
+  {date:'5 Apr 2026',month:'April 2026',desc:'Iuran sesi #3',cat:'Iuran Sesi',type:'in',amt:200000,saldo:440000},
+];
+
+// ── TIER ──
+function getTier(p){return p>=110?'S':p>=55?'A':p>=20?'B':'C'}
+function getTierName(t){const m={S:'Dewa Mahjong 👑',A:'Si Tangan Dingin 🧊',B:'Jagoan Pong 🀄',C:'Si Baru Belajar 👀'};return m[t]||t}
+function getTierBadge(t){const m={S:'tier-s',A:'tier-a',B:'tier-b',C:'tier-c'};const n={S:'Dewa Mahjong',A:'Tangan Dingin',B:'Jagoan Pong',C:'Baru Belajar'};return`<span class="tier-badge ${m[t]}" title="${getTierName(t)}">Tier ${t} · ${n[t]||t}</span>`}
+function getTierNext(pts){
+  if(pts<20)return{next:'B',need:20-pts,pct:Math.round(pts/20*100),col:'var(--muted)'};
+  if(pts<55)return{next:'A',need:55-pts,pct:Math.round((pts-20)/35*100),col:'#2ecc71'};
+  if(pts<110)return{next:'S',need:110-pts,pct:Math.round((pts-55)/55*100),col:'var(--gold)'};
+  return null;
+}
+function getStatusBadge(s){const m={Aktif:'status-aktif','Tidak Aktif':'status-nonaktif',Alumni:'status-alumni'};const ic={Aktif:'●','Tidak Aktif':'○',Alumni:'◈'};return`<span class="${m[s]||'status-nonaktif'}">${ic[s]} ${s}</span>`}
+function fmtDate(d){const ms=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];const dt=new Date(d);return`${dt.getDate()} ${ms[dt.getMonth()]} ${dt.getFullYear()}`}
+function getPlayerById(id){return players.find(p=>p.id===id)}
+
+// ── POIN SISTEM A+ dengan TIE HANDLING ──
+function calcPoinMeja(entries){
+  const wins=entries.map(e=>e.wins);
+  const maxW=Math.max(...wins);
+  const topCount=wins.filter(w=>w===maxW).length;
+  return entries.map(e=>{
+    const w=e.wins;
+    if(maxW===0) return{...e,pts:1,label:'⬜ Hadir',cls:'poin-hadir',rcClass:'rc-4'};
+    if(w===maxW){
+      if(topCount===1) return{...e,pts:3,label:'🥇 Juara',cls:'poin-juara',rcClass:'rc-1'};
+      if(topCount===2) return{...e,pts:2,label:'🥈 Seri Top',cls:'poin-runner2',rcClass:'rc-2'};
+      return{...e,pts:1,label:'⬜ Seri',cls:'poin-hadir',rcClass:'rc-4'};
+    }
+    if(w>=2) return{...e,pts:2,label:'🥈 Runner-up',cls:'poin-runner2',rcClass:'rc-2'};
+    if(w===1) return{...e,pts:1,label:'🥉 3rd',cls:'poin-runner1',rcClass:'rc-3'};
+    return{...e,pts:1,label:'⬜ Hadir',cls:'poin-hadir',rcClass:'rc-4'};
+  });
+}
+
+// ── PLAYER SEARCH DROPDOWN ──
+const selectedPlayers={};
+
+function buildPlayerSearchSlot(m,slot){
+  const key=`m${m}-p${slot}`;
+  const pid=selectedPlayers[m]?.[slot]||null;
+  const p=pid?getPlayerById(pid):null;
+  if(p){
+    return`<div class="selected-player-display" onclick="clearPlayerSlot(${m},${slot})">
+      <div class="di-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div>
+      <span class="sp-name">${p.nick}</span>
+      <span class="sp-clear">✕</span>
+    </div><div class="player-dropdown" id="pdd-${key}"></div>`;
+  }
+  return`<input type="text" class="player-search-input" id="psi-${key}" placeholder="🔍 Cari pemain..."
+    oninput="filterDD('${key}',${m},${slot})" onfocus="filterDD('${key}',${m},${slot})">
+  <div class="player-dropdown" id="pdd-${key}"></div>`;
+}
+
+function filterDD(key,m,slot){
+  const inp=document.getElementById(`psi-${key}`);
+  const q=inp?inp.value.toLowerCase():'';
+  const used=new Set();
+  for(let s=1;s<=4;s++){if(s!==slot&&selectedPlayers[m]?.[s])used.add(selectedPlayers[m][s]);}
+  const list=players.filter(p=>(!q||p.nick.toLowerCase().includes(q)||p.name.toLowerCase().includes(q))&&!used.has(p.id));
+  const dd=document.getElementById(`pdd-${key}`);
+  dd.innerHTML=list.length?list.map(p=>`<div class="player-dropdown-item" onclick="selP(${m},${slot},${p.id})">
+    <div class="di-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div>
+    <div><div class="di-name">${p.nick}</div><div class="di-tier">${p.status}</div></div>
+  </div>`).join(''): `<div style="padding:12px;font-size:12px;color:var(--muted);text-align:center">Tidak ditemukan</div>`;
+  dd.classList.add('open');
+  document.querySelectorAll('.player-dropdown.open').forEach(d=>{if(d.id!==`pdd-${key}`)d.classList.remove('open');});
+}
+
+function selP(m,slot,pid){
+  if(!selectedPlayers[m])selectedPlayers[m]={};
+  selectedPlayers[m][slot]=pid;
+  const key=`m${m}-p${slot}`;
+  const wrap=document.getElementById(`psw-${key}`);
+  if(wrap){const p=getPlayerById(pid);
+    wrap.innerHTML=`<div class="selected-player-display" onclick="clearPlayerSlot(${m},${slot})">
+      <div class="di-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div>
+      <span class="sp-name">${p.nick}</span><span class="sp-clear">✕</span>
+    </div><div class="player-dropdown" id="pdd-${key}"></div>`;
+  }
+  recalcMeja(m);
+}
+
+function clearPlayerSlot(m,slot){
+  if(selectedPlayers[m])selectedPlayers[m][slot]=null;
+  const key=`m${m}-p${slot}`;
+  const wrap=document.getElementById(`psw-${key}`);
+  if(wrap){wrap.innerHTML=`<input type="text" class="player-search-input" id="psi-${key}" placeholder="🔍 Cari pemain..."
+    oninput="filterDD('${key}',${m},${slot})" onfocus="filterDD('${key}',${m},${slot})">
+    <div class="player-dropdown" id="pdd-${key}"></div>`;
+    document.getElementById(`psi-${key}`)?.focus();
+  }
+  recalcMeja(m);
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.player-search-wrap')&&!e.target.closest('.selected-player-display'))
+    document.querySelectorAll('.player-dropdown.open').forEach(d=>d.classList.remove('open'));
+});
+
+// ── BUILD MEJA ──
+function buildMeja(cid='meja-container',n=null,prefill=null){
+  const num=n||parseInt(document.getElementById('sesi-meja').value);
+  for(let m=1;m<=5;m++){selectedPlayers[m]={};}
+  if(prefill){prefill.forEach(mj=>{if(!selectedPlayers[mj.mejaNo])selectedPlayers[mj.mejaNo]={};mj.players.forEach((e,i)=>{selectedPlayers[mj.mejaNo][i+1]=e.pid;});});}
+  let html='';
+  for(let m=1;m<=num;m++){
+    const pw=prefill?prefill[m-1]?.players||[]:[];
+    html+=`<div class="meja-block">
+      <div class="meja-header"><span class="meja-title">🀄 Meja ${m}</span><span class="meja-total" id="tot-${cid}-m${m}">—</span></div>
+      <div class="meja-body">
+        <div style="display:grid;grid-template-columns:1fr 90px 140px 72px;gap:10px;padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Pemain</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;text-align:center">Jml Menang</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;text-align:center">Posisi</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;text-align:center">Poin</div>
+        </div>
+        ${[1,2,3,4].map(p=>{const pw2=pw[p-1]?.wins??0;return`
+        <div class="player-entry">
+          <div class="player-search-wrap" id="psw-m${m}-p${p}">${buildPlayerSearchSlot(m,p)}</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input type="number" class="wins-input" id="wins-${cid}-m${m}-p${p}" value="${pw2}" min="0" max="30"
+              onchange="recalcMeja(${m},'${cid}')" oninput="recalcMeja(${m},'${cid}')">
+            <span style="font-size:10px;color:var(--muted)">game</span>
+          </div>
+          <div style="text-align:center"><span class="rank-chip rc-4" id="pos-${cid}-m${m}-p${p}">Penonton Setia ⬜</span></div>
+          <div style="text-align:center"><span class="poin-preview poin-hadir" id="pts-${cid}-m${m}-p${p}">+1</span></div>
+        </div>`}).join('')}
+        <div class="konversi-box" id="konv-${cid}-m${m}" style="display:none">
+          <div class="konversi-title">Preview Poin Komunitas</div>
+          <div id="konv-rows-${cid}-m${m}"></div>
+        </div>
+      </div>
+    </div>`;
+  }
+  document.getElementById(cid).innerHTML=html;
+  if(prefill){for(let m=1;m<=num;m++)recalcMeja(m,cid);}
+}
+
+function recalcMeja(m,cid='meja-container'){
+  const entries=[];
+  for(let p=1;p<=4;p++){
+    const w=parseInt(document.getElementById(`wins-${cid}-m${m}-p${p}`)?.value)||0;
+    const pid=selectedPlayers[m]?.[p]||null;
+    entries.push({pid,wins:w});
+  }
+  const results=calcPoinMeja(entries);
+  const maxW=Math.max(...entries.map(e=>e.wins));
+  const totEl=document.getElementById(`tot-${cid}-m${m}`);
+  if(totEl)totEl.textContent=maxW>0?`~${maxW}+ game dimainkan`:'Belum ada data';
+  const konvRows=[];
+  results.forEach((r,i)=>{
+    const posEl=document.getElementById(`pos-${cid}-m${m}-p${i+1}`);
+    const ptsEl=document.getElementById(`pts-${cid}-m${m}-p${i+1}`);
+    if(posEl){posEl.className=`rank-chip ${r.rcClass}`;posEl.textContent=r.label;}
+    if(ptsEl){ptsEl.className=`poin-preview ${r.cls}`;ptsEl.textContent=`+${r.pts}`;}
+    if(r.pid){const pl=getPlayerById(r.pid);if(pl)konvRows.push({name:pl.nick,wins:r.wins,pts:r.pts,label:r.label});}
+  });
+  const kbox=document.getElementById(`konv-${cid}-m${m}`);
+  const krows=document.getElementById(`konv-rows-${cid}-m${m}`);
+  if(kbox&&krows){
+    if(konvRows.length>0){kbox.style.display='block';krows.innerHTML=konvRows.map(r=>`<div class="konversi-row"><span>${r.name} <span style="color:var(--muted);font-size:11px">(${r.wins} menang)</span></span><span>${r.label} → <span class="konversi-pts">+${r.pts}</span></span></div>`).join('');}
+    else kbox.style.display='none';
+  }
+}
+
+function resetSession(){for(let m=1;m<=5;m++)selectedPlayers[m]={};buildMeja();showToast('Form direset');}
+function submitSession(){showToast('✓ Sesi berhasil disimpan! Poin leaderboard diperbarui.');}
+
+// ── HISTORY ──
+function calcTotalPoin(s){let t=0;s.hasil.forEach(mj=>{calcPoinMeja(mj.players.map(e=>({...e}))).forEach(r=>t+=r.pts);});return t;}
+function calcMaxGame(s){let mx=0;s.hasil.forEach(mj=>{const m=Math.max(...mj.players.map(e=>e.wins));if(m>mx)mx=m;});return mx;}
+
+function renderHistory(){
+  document.getElementById('history-body').innerHTML=sesiData.map(s=>{
+    const tp=calcTotalPoin(s),mg=calcMaxGame(s);
+    return`<tr>
+      <td><strong>#${s.id}</strong></td><td>${s.tglStr}</td><td>${s.meja} meja</td><td>${s.dur} jam</td>
+      <td>${s.pemain}</td><td>~${mg}+</td><td>${tp} poin</td>
+      <td style="font-size:11px;color:${s.edited?'var(--gold)':'var(--muted)'}">${s.edited?`✏️ ${s.editLog}`:'—'}</td>
+      <td style="display:flex;gap:5px">
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Detail sesi #${s.id}')">Lihat</button>
+        <button class="btn btn-sm" style="background:rgba(201,147,58,.12);border:1px solid rgba(201,147,58,.3);color:var(--gold);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;padding:5px 10px" onclick="editSesi(${s.id})">✏️ Edit</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+let currentEditId=null;
+function editSesi(id){
+  const s=sesiData.find(x=>x.id===id);if(!s)return;
+  currentEditId=id;
+  document.getElementById('edit-sesi-sub').textContent=`Sesi #${id} · ${s.tglStr} · ${s.meja} meja — ubah jumlah menang lalu simpan`;
+  document.getElementById('edit-sesi-tgl').value=s.tgl;
+  document.getElementById('edit-sesi-dur').value=s.dur;
+  document.getElementById('edit-sesi-note').value=s.note||'';;
+  // Prefill selected players for edit
+  s.hasil.forEach((mj,mi)=>{
+    if(!selectedPlayers[mi+1])selectedPlayers[mi+1]={};
+    mj.players.forEach((e,j)=>{selectedPlayers[mi+1][j+1]=e.pid;});
+  });
+  let html='';
+  s.hasil.forEach((mj,mi)=>{
+    const m=mi+1;
+    html+=`<div class="edit-sesi-wins">
+      <div class="edit-sesi-wins-header">🀄 Meja ${m}</div>
+      ${mj.players.map((entry,pi)=>{
+        const p=getPlayerById(entry.pid);
+        return`<div class="edit-wins-row">
+          <div class="player-info">${p?`<div class="player-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div><div class="player-name">${p.nick}</div>`:`<span style="color:var(--muted)">#${entry.pid}</span>`}</div>
+          <input type="number" class="wins-input" id="ew-m${m}-p${pi+1}" value="${entry.wins}" min="0" max="30"
+            oninput="recalcEditPrev(${m},'${mj.players.map(e=>e.pid).join(',')}')">
+          <span class="poin-preview poin-hadir" id="ep-m${m}-p${pi+1}">+1</span>
+        </div>`;
+      }).join('')}
+      <div id="ep-konv-m${m}" style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.8"></div>
+    </div>`;
+  });
+  document.getElementById('edit-sesi-meja-container').innerHTML=html;
+  s.hasil.forEach((mj,mi)=>recalcEditPrev(mi+1,mj.players.map(e=>e.pid).join(',')));
+  openModal('modal-edit-sesi');
+}
+
+function recalcEditPrev(m,pidStr){
+  const pids=pidStr.split(',').map(Number);
+  const entries=pids.map((pid,i)=>({pid,wins:parseInt(document.getElementById(`ew-m${m}-p${i+1}`)?.value)||0}));
+  const results=calcPoinMeja(entries);
+  const lines=[];
+  results.forEach((r,i)=>{
+    const el=document.getElementById(`ep-m${m}-p${i+1}`);
+    if(el){el.className=`poin-preview ${r.cls}`;el.textContent=`+${r.pts}`;}
+    const p=getPlayerById(r.pid);
+    if(p)lines.push(`${p.nick}: ${r.label} <strong style="color:var(--gold)">+${r.pts}</strong>`);
+  });
+  const kEl=document.getElementById(`ep-konv-m${m}`);
+  if(kEl)kEl.innerHTML=lines.join(' &nbsp;·&nbsp; ');
+}
+
+function confirmEditSesi(){
+  document.getElementById('confirm-edit-text').textContent=`Perubahan pada Sesi #${currentEditId} akan recalculate poin semua pemain di sesi ini dan update leaderboard. Dicatat di log. Lanjutkan?`;
+  document.getElementById('confirm-edit').classList.add('open');
+}
+function closeConfirm(){document.getElementById('confirm-edit').classList.remove('open');}
+function doEditSesi(){
+  closeConfirm();closeModal('modal-edit-sesi');
+  const s=sesiData.find(x=>x.id===currentEditId);
+  if(s){s.edited=true;s.editLog='Diedit '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+  renderHistory();
+  showToast(`✓ Sesi #${currentEditId} berhasil diperbarui! Leaderboard direcalculate.`);
+}
+
+// ── DASHBOARD TOP5 ──
+function renderDashTop5(){
+  const s=[...players].sort((a,b)=>b.pts-a.pts).slice(0,10);
+  document.getElementById('dash-top5').innerHTML=s.map((p,i)=>{
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">${i+1}</span>`;
+    const wr=p.games>0?Math.round(p.wins/p.games*100):0;
+    const t=getTier(p.pts);
+    const rowBg=i===0?'background:rgba(255,215,0,.04)':i===1?'background:rgba(192,192,192,.03)':i===2?'background:rgba(205,127,50,.03)':'';
+    const streakStr=p.streak>0?'🔥'.repeat(Math.min(p.streak,3))+` ${p.streak}× streak`:'';
+    return`<tr style="${rowBg}">
+      <td><span class="rank-num ${rc}">${medal}</span></td>
+      <td><div class="player-info">
+        <div class="player-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div>
+        <div><div class="player-name">${p.nick}</div>
+        ${streakStr?`<div class="player-joined">${streakStr}</div>`:''}
+        </div>
+      </div></td>
+      <td><span class="points-val">${p.pts}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:13px">${p.wins}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">${p.games}</td>
+      <td><div style="display:flex;align-items:center;gap:5px">
+        <div style="width:44px;background:var(--border);border-radius:99px;height:3px;overflow:hidden">
+          <div style="width:${wr}%;height:100%;background:var(--green);border-radius:99px"></div>
+        </div>
+        <span style="font-size:11px;color:var(--muted)">${wr}%</span>
+      </div></td>
+      <td>${getTierBadge(t)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── LEADERBOARD ──
+function renderLeaderboard(){
+  const s=[...players].sort((a,b)=>b.pts-a.pts);
+  document.getElementById('leaderboard-body').innerHTML=s.map((p,i)=>{
+    const wr=p.games>0?Math.round(p.wins/p.games*100):0;
+    const st=p.streak>0?'🔥'.repeat(Math.min(p.streak,5))+` ${p.streak}×`:'—';
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    return`<tr><td><span class="rank-num ${rc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span></td>
+    <td><div class="player-info"><div class="player-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div>
+    <div><div class="player-name">${p.nick}</div><div class="player-joined">${fmtDate(p.joined)}</div></div></div></td>
+    <td><span class="points-val">${p.pts}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace">${p.wins}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${p.games}</td>
+    <td><div style="display:flex;align-items:center;gap:5px"><div style="flex:1;background:var(--border);border-radius:99px;height:3px;min-width:36px;overflow:hidden"><div style="width:${wr}%;height:100%;background:var(--green);border-radius:99px"></div></div><span style="font-size:11px;color:var(--muted)">${wr}%</span></div></td>
+    <td style="font-size:12px">${st}</td><td>${getTierBadge(getTier(p.pts))}</td></tr>`;
+  }).join('');
+  document.getElementById('alltime-body').innerHTML=s.map((p,i)=>{
+    const wr=p.games>0?Math.round(p.wins/p.games*100):0;const t=getTier(p.pts);const n=getTierNext(p.pts);
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    return`<tr><td><span class="rank-num ${rc}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span></td>
+    <td><div class="player-info"><div class="player-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div><div class="player-name">${p.nick}</div></div></td>
+    <td><span class="points-val">${p.pts}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace">${p.wins}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${p.games}</td>
+    <td style="color:var(--green);font-size:12px">${wr}%</td><td>${getTierBadge(t)}</td>
+    <td>${n?`<div style="font-size:10px;color:var(--muted)">+${n.need} → Tier ${n.next}</div><div class="tier-progress-bar" style="width:90px;margin-top:3px"><div class="tier-progress-fill" style="width:${n.pct}%;background:${n.col}"></div></div>`:`<span style="font-size:11px;color:#FFD700">👑 MAX</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PLAYERS ──
+function renderPlayers(){
+  const q=(document.getElementById('player-search').value||'').toLowerCase();
+  const sF=document.getElementById('filter-status').value;
+  const tF=document.getElementById('filter-tier').value;
+  const list=players.filter(p=>{
+    const mq=!q||p.name.toLowerCase().includes(q)||p.nick.toLowerCase().includes(q)||p.wa.includes(q);
+    return mq&&(!sF||p.status===sF)&&(!tF||getTier(p.pts)===tF);
+  }).sort((a,b)=>a.nick.localeCompare(b.nick,'id'));
+  document.getElementById('players-body').innerHTML=list.length?list.map(p=>{
+    const n=getTierNext(p.pts);
+    return`<tr>
+    <td><div class="player-info"><div class="player-avatar" style="background:${p.color};color:${p.ac}">${p.avatar}</div>
+    <div><div class="player-name">${p.nick}</div><div class="player-joined">${p.name}</div></div></div></td>
+    <td style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace">${p.wa.slice(0,4)}****${p.wa.slice(-3)}</td>
+    <td style="font-size:12px;color:var(--muted)">${fmtDate(p.joined)}</td>
+    <td><span class="points-val">${p.pts}</span>${n?`<div style="font-size:10px;color:var(--muted);margin-top:2px">+${n.need} → Tier ${n.next}</div><div class="tier-progress-bar" style="margin-top:3px;width:80px"><div class="tier-progress-fill" style="width:${n.pct}%;background:${n.col}"></div></div>`:`<div style="font-size:10px;color:#FFD700;margin-top:2px">👑 MAX</div>`}</td>
+    <td style="font-size:13px">${p.games}×</td><td>${getTierBadge(getTier(p.pts))}</td>
+    <td>${getStatusBadge(p.status)}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="openEditPlayer(${p.id})">Edit</button></td>
+    </tr>`;
+  }).join(''): `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">Tidak ada pemain ditemukan</td></tr>`;
+}
+function openEditPlayer(id){
+  const p=players.find(x=>x.id===id);if(!p)return;
+  document.getElementById('edit-fullname').value=p.name;
+  document.getElementById('edit-nickname').value=p.nick;
+  document.getElementById('edit-wa').value=p.wa;
+  document.getElementById('edit-joined').value=p.joined;
+  document.getElementById('edit-status').value=p.status;
+  document.getElementById('edit-notes').value=p.notes||'';;
+  openModal('modal-edit-player');
+}
+
+// ── KAS ──
+let kasMonth='Juni 2026',kasType='';
+function renderKas(){
+  const data=kasData.filter(tx=>(kasMonth==='all'||tx.month===kasMonth)&&(!kasType||tx.type===kasType));
+  document.getElementById('kas-body').innerHTML=data.length?data.map(tx=>`<tr>
+    <td style="font-size:11px;color:var(--muted)">${tx.date}</td><td>${tx.desc}</td>
+    <td style="font-size:11px;color:var(--muted)">${tx.cat}</td>
+    <td><span class="tx-type ${tx.type==='in'?'tx-in':'tx-out'}">${tx.type==='in'?'↑ Masuk':'↓ Keluar'}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:${tx.type==='in'?'var(--green)':'var(--red)'}">
+      ${tx.type==='in'?'+':'−'} ${tx.amt.toLocaleString('id-ID')}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">${tx.saldo.toLocaleString('id-ID')}</td>
+  </tr>`).join(''):`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Tidak ada transaksi</td></tr>`;
+}
+function filterKas(m,btn){kasMonth=m;document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderKas();}
+function filterKasType(t){kasType=t;renderKas();}
+
+// ── NAV & SIDEBAR ──
+const pageTitles={dashboard:'Dashboard',leaderboard:'Leaderboard',session:'Catat Sesi',players:'Pemain',history:'Riwayat Sesi',kas:'Kas Komunitas',settings:'Pengaturan',rules:'Rules Mahjong'};
+let sidebarOpen=false;
+function nav(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('topbar-title').textContent=pageTitles[id]||'';
+  if(el)el.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(item=>{if(item.getAttribute('onclick')&&item.getAttribute('onclick').includes(`'${id}'`))item.classList.add('active');});
+  if(window.innerWidth<768)closeSidebar();
+}
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed',!sidebarOpen);
+  document.getElementById('overlay').classList.toggle('show',sidebarOpen);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.add('collapsed');
+  document.getElementById('overlay').classList.remove('show');
+  sidebarOpen=false;
+}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+function switchTab(btn,tid){
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  btn.closest('.page').querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById(tid).classList.add('active');
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>{t.style.opacity='0'},3000);}
+
+// ── LOGO MANAGEMENT ──
+const DEFAULT_LOGO = 'https://design.canva.ai/48fi2WAxiIZjr5P';
+
+function openLogoUploader(){openModal('modal-logo');}
+
+function previewLogoFile(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('logo-preview-modal').src=e.target.result;
+    document.getElementById('logo-url-input').value='';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function previewLogoURL(url){
+  if(!url)return;
+  document.getElementById('logo-preview-modal').src=url;
+  document.getElementById('logo-file-input').value='';
+}
+
+function saveLogo(){
+  const src=document.getElementById('logo-preview-modal').src;
+  if(!src)return;
+  // Apply to sidebar
+  const img=document.getElementById('logo-img');
+  const fb=document.getElementById('logo-fallback');
+  if(img){img.src=src;img.style.display='block';if(fb)fb.style.display='none';}
+  // Save to sessionStorage (localStorage not available in artifact)
+  try{sessionStorage.setItem('gmc-logo',src);}catch(e){}
+  closeModal('modal-logo');
+  showToast('✓ Logo berhasil diperbarui!');
+}
+
+function resetLogo(){
+  document.getElementById('logo-preview-modal').src=DEFAULT_LOGO;
+  const img=document.getElementById('logo-img');
+  if(img){img.src=DEFAULT_LOGO;img.style.display='block';}
+  try{sessionStorage.removeItem('gmc-logo');}catch(e){}
+  closeModal('modal-logo');
+  showToast('Logo direset ke default GMC');
+}
+
+// Restore logo on load
+(function(){
+  try{
+    const saved=sessionStorage.getItem('gmc-logo');
+    if(saved){const img=document.getElementById('logo-img');if(img)img.src=saved;}
+  }catch(e){}
+})();
+
+// ── LOGOUT ──
+function confirmLogout(){document.getElementById('confirm-logout').classList.add('open');}
+function doLogout(){
+  document.getElementById('confirm-logout').classList.remove('open');
+  document.body.innerHTML=`<div style="min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;font-family:Inter,sans-serif">
+    <div style="font-size:48px">🀄</div>
+    <div style="font-family:'Noto Serif SC',serif;font-size:22px;color:var(--gold)">GSBSD Mahjong Community</div>
+    <div style="font-size:13px;color:var(--muted)">Anda telah logout. Sampai jumpa di sesi berikutnya!</div>
+    <button onclick="location.reload()" style="margin-top:8px;padding:9px 20px;background:var(--gold);color:#0f0e0d;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Login Kembali</button>
+  </div>`;
+}
+
+// ── INIT ──
+const pTitles={dashboard:'Dashboard',leaderboard:'Leaderboard',session:'Catat Sesi',players:'Pemain',history:'Riwayat Sesi',kas:'Kas Komunitas',settings:'Pengaturan',rules:'Rules Mahjong'};
+renderDashTop5();renderLeaderboard();renderPlayers();renderKas();renderHistory();buildMeja();
+
+// ════════════════════════════════════════════════════════
+// GMC — SUPABASE INTEGRATION
+// GSBSD Mahjong Community | gsbsdmahjong.my.id
+// ════════════════════════════════════════════════════════
+
+const SUPA_URL = "https://pxfpskzwkfpxslsvqbpz.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4ZnBza3p3a2ZweHNsc3ZxYnB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDIxODUsImV4cCI6MjA5NTYxODE4NX0.KQ8ozsVzZOesp_ickIbdaYmQR9_0TA4xN40MDMjUeFI";
+let sb = null;  // Supabase client
+let currentUser = null;
+let currentUserId = null;
+
+// ── INIT ──
+async function initApp() {
+  try {
+    sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+    setLoadingMsg("Memeriksa sesi login...");
+
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      currentUserId = session.user.id;
+      await loadAllData();
+      hideOverlays();
+    } else {
+      // Check if public view
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('view') === 'public') {
+        currentUserId = null;
+        await loadPublicData();
+        hideOverlays();
+        showPublicMode();
+      } else {
+        showLoginOverlay();
+      }
+    }
+
+    // Listen for auth changes
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        currentUser = session.user;
+        currentUserId = session.user.id;
+        await loadAllData();
+        hideOverlays();
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        currentUserId = null;
+        showLoginOverlay();
+      }
+    });
+
+    // Subscribe to realtime leaderboard
+    sb.channel('gmc-players')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gmc_players' },
+        () => { renderDashTop5(); renderLeaderboard(); })
+      .subscribe();
+
+  } catch(err) {
+    console.error('Init error:', err);
+    setLoadingMsg("Error: " + err.message);
+    showLoginOverlay();
+  }
+}
+
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loading-msg');
+  if(el) el.textContent = msg;
+}
+
+function hideOverlays() {
+  document.getElementById('loading-overlay').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+}
+
+function showLoginOverlay() {
+  document.getElementById('loading-overlay').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+}
+
+function showPublicMode() {
+  // Hide host-only elements
+  document.querySelectorAll('.nav-item').forEach(el => {
+    const txt = el.textContent.trim();
+    if(['Catat Sesi','Kas Komunitas','Pengaturan'].includes(txt))
+      el.style.display = 'none';
+  });
+  document.querySelector('.topbar-actions').style.display = 'none';
+  document.querySelector('.sidebar-footer').style.display = 'none';
+}
+
+// ── AUTH ──
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  if(!email || !pw) {
+    errEl.textContent = 'Email dan password harus diisi';
+    errEl.style.display = 'block'; return;
+  }
+  btn.textContent = 'Masuk...'; btn.disabled = true;
+  errEl.style.display = 'none';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if(error) {
+    errEl.textContent = error.message === 'Invalid login credentials'
+      ? 'Email atau password salah' : error.message;
+    errEl.style.display = 'block';
+    btn.textContent = 'Masuk'; btn.disabled = false;
+  }
+  // success handled by onAuthStateChange
+}
+
+function doLogout() {
+  document.getElementById('confirm-logout').classList.remove('open');
+  sb.auth.signOut();
+  showToast('Berhasil logout');
+}
+
+// ── LOAD ALL DATA ──
+async function loadAllData() {
+  setLoadingMsg("Memuat data pemain...");
+  await loadPlayers();
+  setLoadingMsg("Memuat sesi...");
+  await loadSessions();
+  setLoadingMsg("Memuat kas...");
+  await loadKas();
+}
+
+async function loadPublicData() {
+  setLoadingMsg("Memuat leaderboard...");
+  await loadPlayers();
+}
+
+// ── PLAYERS ──
+async function loadPlayers() {
+  if(!sb) return;
+  const query = currentUserId
+    ? sb.from('gmc_players').select('*').eq('user_id', currentUserId).order('pts', { ascending: false })
+    : sb.from('gmc_players').select('*').order('pts', { ascending: false });
+
+  const { data, error } = await query;
+  if(error) { console.error('loadPlayers:', error); return; }
+
+  // Merge into players array
+  players.length = 0;
+  (data || []).forEach(p => {
+    players.push({
+      id: p.id,
+      name: p.name,
+      nick: p.nick,
+      avatar: p.avatar || p.nick.substring(0,2),
+      color: p.color || '#1a1815',
+      ac: p.ac || '#c9933a',
+      joined: p.joined,
+      wa: p.wa || '',
+      pts: p.pts,
+      wins: p.wins,
+      games: p.games,
+      status: p.status,
+      streak: p.streak,
+      notes: p.notes || '',
+    });
+  });
+
+  renderDashTop5();
+  renderLeaderboard();
+  renderPlayers();
+}
+
+async function saveNewPlayer(data) {
+  if(!currentUserId) return;
+  const { error } = await sb.from('gmc_players').insert({
+    user_id: currentUserId,
+    name: data.name,
+    nick: data.nick,
+    wa: data.wa || '',
+    joined: data.joined || new Date().toISOString().split('T')[0],
+    notes: data.notes || '',
+    avatar: data.nick.substring(0,2).toUpperCase(),
+    color: '#' + Math.floor(Math.random()*0x444444+0x1a1815).toString(16).padStart(6,'0'),
+    ac: '#c9933a',
+    pts: 0, wins: 0, games: 0, streak: 0,
+    status: 'Aktif',
+  });
+  if(error) { showToast('Error: ' + error.message); return false; }
+  await loadPlayers();
+  return true;
+}
+
+async function updatePlayer(id, data) {
+  if(!currentUserId) return;
+  const { error } = await sb.from('gmc_players')
+    .update({ ...data, updated_at: new Date().toISOString() })
+    .eq('id', id).eq('user_id', currentUserId);
+  if(error) { showToast('Error: ' + error.message); return false; }
+  await loadPlayers();
+  return true;
+}
+
+// ── SESSIONS ──
+async function loadSessions() {
+  if(!sb || !currentUserId) return;
+  const { data: sessions, error } = await sb
+    .from('gmc_sessions').select(`
+      id, tgl, dur, jumlah_meja, jumlah_pemain, note, edited, edit_log,
+      gmc_session_results ( id, meja_no, player_id, wins, poin, posisi )
+    `)
+    .eq('user_id', currentUserId)
+    .order('tgl', { ascending: false });
+
+  if(error) { console.error('loadSessions:', error); return; }
+
+  sesiData.length = 0;
+  (sessions || []).forEach(s => {
+    // Group results by meja
+    const mejaMap = {};
+    (s.gmc_session_results || []).forEach(r => {
+      if(!mejaMap[r.meja_no]) mejaMap[r.meja_no] = [];
+      mejaMap[r.meja_no].push({ pid: r.player_id, wins: r.wins, poin: r.poin, posisi: r.posisi });
+    });
+    const hasil = Object.entries(mejaMap)
+      .sort((a,b) => parseInt(a[0])-parseInt(b[0]))
+      .map(([mejaNo, players]) => ({ mejaNo: parseInt(mejaNo), players }));
+
+    sesiData.push({
+      id: s.id,
+      tgl: s.tgl,
+      tglStr: fmtDate(s.tgl),
+      dur: s.dur,
+      meja: s.jumlah_meja,
+      pemain: s.jumlah_pemain,
+      note: s.note || '',
+      edited: s.edited,
+      editLog: s.edit_log || '',
+      hasil,
+    });
+  });
+
+  renderHistory();
+}
+
+async function saveSession(formData) {
+  if(!currentUserId) return false;
+  const { tgl, dur, mejaCount, note, mejaResults } = formData;
+
+  // Insert session
+  const { data: sess, error: sErr } = await sb.from('gmc_sessions').insert({
+    user_id: currentUserId,
+    tgl, dur,
+    jumlah_meja: mejaCount,
+    jumlah_pemain: mejaResults.reduce((s, m) => s + m.players.filter(p => p.pid).length, 0),
+    note,
+  }).select().single();
+  if(sErr) { showToast('Error simpan sesi: ' + sErr.message); return false; }
+
+  const sessionId = sess.id;
+
+  // Insert results & update player pts
+  const resultRows = [];
+  const playerUpdates = {};
+
+  for(const meja of mejaResults) {
+    const entries = meja.players.filter(p => p.pid);
+    const computed = calcPoinMeja(entries);
+    for(const r of computed) {
+      if(!r.pid) continue;
+      resultRows.push({
+        session_id: sessionId,
+        meja_no: meja.mejaNo,
+        player_id: r.pid,
+        wins: r.wins,
+        poin: r.pts,
+        posisi: r.label,
+      });
+      if(!playerUpdates[r.pid]) playerUpdates[r.pid] = { pts: 0, wins: 0, games: 0 };
+      playerUpdates[r.pid].pts += r.pts;
+      if(r.label.includes('Raja Meja')) playerUpdates[r.pid].wins += 1;
+      playerUpdates[r.pid].games += 1;
+    }
+  }
+
+  // Insert all results
+  if(resultRows.length > 0) {
+    const { error: rErr } = await sb.from('gmc_session_results').insert(resultRows);
+    if(rErr) { showToast('Error simpan hasil: ' + rErr.message); return false; }
+  }
+
+  // Update player pts (increment)
+  for(const [pid, delta] of Object.entries(playerUpdates)) {
+    const player = players.find(p => p.id === parseInt(pid));
+    if(!player) continue;
+    await sb.from('gmc_players').update({
+      pts: player.pts + delta.pts,
+      wins: player.wins + delta.wins,
+      games: player.games + delta.games,
+      updated_at: new Date().toISOString(),
+    }).eq('id', parseInt(pid));
+  }
+
+  await loadAllData();
+  return true;
+}
+
+async function editSesiSave(sessionId, formData) {
+  if(!currentUserId) return false;
+  const { tgl, dur, note, mejaResults } = formData;
+
+  // Get old results to reverse pts
+  const { data: oldResults } = await sb.from('gmc_session_results')
+    .select('player_id, poin, posisi').eq('session_id', sessionId);
+
+  // Reverse old pts
+  const reverseMap = {};
+  (oldResults || []).forEach(r => {
+    if(!reverseMap[r.player_id]) reverseMap[r.player_id] = 0;
+    reverseMap[r.player_id] -= r.poin;
+  });
+
+  // Delete old results
+  await sb.from('gmc_session_results').delete().eq('session_id', sessionId);
+
+  // Compute new results
+  const resultRows = [];
+  const newDelta = {};
+  for(const meja of mejaResults) {
+    const entries = meja.players.filter(p => p.pid);
+    const computed = calcPoinMeja(entries);
+    for(const r of computed) {
+      if(!r.pid) continue;
+      resultRows.push({
+        session_id: sessionId,
+        meja_no: meja.mejaNo,
+        player_id: r.pid,
+        wins: r.wins,
+        poin: r.pts,
+        posisi: r.label,
+      });
+      if(!newDelta[r.pid]) newDelta[r.pid] = 0;
+      newDelta[r.pid] += r.pts;
+    }
+  }
+
+  // Insert new results
+  if(resultRows.length > 0)
+    await sb.from('gmc_session_results').insert(resultRows);
+
+  // Update session metadata
+  const today = new Date().toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'});
+  await sb.from('gmc_sessions').update({
+    tgl, dur, note,
+    edited: true,
+    edit_log: 'Diedit ' + today,
+    updated_at: new Date().toISOString(),
+  }).eq('id', sessionId);
+
+  // Update all involved players via recalc function
+  const allPids = new Set([
+    ...Object.keys(reverseMap).map(Number),
+    ...Object.keys(newDelta).map(Number)
+  ]);
+  for(const pid of allPids) {
+    // Get current pts and recalc
+    const { data: allR } = await sb.from('gmc_session_results')
+      .select('poin, posisi').eq('player_id', pid);
+    const totalPts = (allR||[]).reduce((s,r)=>s+r.poin,0);
+    const totalWins = (allR||[]).filter(r=>r.posisi.includes('Raja Meja')).length;
+    const totalGames = (allR||[]).length;
+    await sb.from('gmc_players').update({
+      pts: totalPts, wins: totalWins, games: totalGames,
+      updated_at: new Date().toISOString(),
+    }).eq('id', pid);
+  }
+
+  await loadAllData();
+  return true;
+}
+
+// ── KAS ──
+async function loadKas() {
+  if(!sb || !currentUserId) return;
+  const { data, error } = await sb.from('gmc_kas')
+    .select('*').eq('user_id', currentUserId).order('tgl', { ascending: false });
+  if(error) { console.error('loadKas:', error); return; }
+
+  kasData.length = 0;
+  (data||[]).forEach(tx => {
+    const d = new Date(tx.tgl);
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+    kasData.push({
+      date: `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`,
+      month: `${months[d.getMonth()]} ${d.getFullYear()}`,
+      desc: tx.deskripsi,
+      cat: tx.kategori,
+      type: tx.tipe,
+      amt: tx.jumlah,
+      saldo: tx.saldo,
+    });
+  });
+
+  renderKas();
+  updateKasSummary();
+}
+
+async function saveKasTx(txData) {
+  if(!currentUserId) return false;
+
+  // Calculate new saldo
+  const lastSaldo = kasData.length > 0 ? kasData[0].saldo : 0;
+  const newSaldo = txData.tipe === 'in'
+    ? lastSaldo + txData.jumlah
+    : lastSaldo - txData.jumlah;
+
+  const { error } = await sb.from('gmc_kas').insert({
+    user_id: currentUserId,
+    tgl: txData.tgl,
+    deskripsi: txData.desc,
+    kategori: txData.kategori,
+    tipe: txData.tipe,
+    jumlah: txData.jumlah,
+    saldo: newSaldo,
+  });
+
+  if(error) { showToast('Error: ' + error.message); return false; }
+  await loadKas();
+  return true;
+}
+
+function updateKasSummary() {
+  const juni = kasData.filter(tx => tx.month === 'Jun ' + new Date().getFullYear());
+  const totalIn = juni.filter(tx => tx.type === 'in').reduce((s,tx) => s+tx.amt, 0);
+  const totalOut = juni.filter(tx => tx.type === 'out').reduce((s,tx) => s+tx.amt, 0);
+  const saldo = kasData.length > 0 ? kasData[0].saldo : 0;
+  const fmt = n => 'Rp ' + n.toLocaleString('id-ID');
+
+  const elIn = document.querySelector('.kas-amount.kas-in');
+  const elOut = document.querySelector('.kas-amount.kas-out');
+  const elNet = document.querySelector('.kas-amount.kas-net');
+  if(elIn) elIn.textContent = fmt(totalIn);
+  if(elOut) elOut.textContent = fmt(totalOut);
+  if(elNet) elNet.textContent = fmt(saldo);
+}
+
+// ── OVERRIDE submitSession (connect to Supabase) ──
+async function submitSession() {
+  const tgl = document.getElementById('sesi-tgl').value;
+  const dur = parseInt(document.getElementById('sesi-dur').value) || 2;
+  const mejaCount = parseInt(document.getElementById('sesi-meja').value) || 2;
+  const note = document.getElementById('sesi-note').value;
+
+  if(!tgl) { showToast('Tanggal sesi harus diisi'); return; }
+
+  // Collect meja results
+  const mejaResults = [];
+  for(let m=1; m<=mejaCount; m++) {
+    const players4 = [];
+    for(let p=1; p<=4; p++) {
+      const pid = selectedPlayers[m]?.[p] || null;
+      const wins = parseInt(document.getElementById(`wins-meja-container-m${m}-p${p}`)?.value) || 0;
+      if(pid) players4.push({ pid, wins });
+    }
+    if(players4.length > 0) mejaResults.push({ mejaNo: m, players: players4 });
+  }
+
+  if(mejaResults.length === 0) { showToast('Pilih minimal 1 pemain'); return; }
+
+  const btn = document.querySelector('[onclick="submitSession()"]');
+  if(btn) { btn.textContent = 'Menyimpan...'; btn.disabled = true; }
+
+  const ok = await saveSession({ tgl, dur, mejaCount, note, mejaResults });
+  if(ok) {
+    showToast('✓ Sesi berhasil disimpan! Poin diperbarui.');
+    resetSession();
+  }
+  if(btn) { btn.textContent = '💾 Simpan & Update Poin'; btn.disabled = false; }
+}
+
+// ── OVERRIDE saveNewPlayer form ──
+async function handleAddPlayer() {
+  const name = document.querySelector('#modal-player input[type=text]')?.value?.trim();
+  const nick = document.querySelectorAll('#modal-player input[type=text]')[1]?.value?.trim();
+  const wa   = document.querySelectorAll('#modal-player input[type=text]')[2]?.value?.trim();
+  const joined = document.querySelector('#modal-player input[type=date]')?.value;
+  const notes = document.querySelectorAll('#modal-player input[type=text]')[3]?.value?.trim();
+
+  if(!name || !nick) { showToast('Nama wajib diisi'); return; }
+  const ok = await saveNewPlayer({ name, nick, wa, joined, notes });
+  if(ok) {
+    closeModal('modal-player');
+    showToast('✓ Pemain baru berhasil didaftarkan!');
+  }
+}
+
+// ── OVERRIDE saveEditPlayer ──
+async function saveEditPlayer() {
+  const id = editingPlayerId;
+  if(!id) return;
+  const data = {
+    name: document.getElementById('edit-fullname').value,
+    nick: document.getElementById('edit-nickname').value,
+    wa: document.getElementById('edit-wa').value,
+    joined: document.getElementById('edit-joined').value,
+    status: document.getElementById('edit-status').value,
+    notes: document.getElementById('edit-notes').value || '',
+    tier_override: document.getElementById('edit-tier').value,
+  };
+  const ok = await updatePlayer(id, data);
+  if(ok) {
+    closeModal('modal-edit-player');
+    showToast('✓ Data pemain diperbarui!');
+  }
+}
+
+// ── OVERRIDE doEditSesi ──
+async function doEditSesi() {
+  closeConfirm();
+  const s = sesiData.find(x => x.id === currentEditId);
+  if(!s) return;
+
+  const mejaResults = [];
+  s.hasil.forEach((meja, mi) => {
+    const pids = meja.players.map(e => e.pid);
+    const entries = pids.map((pid, i) => ({
+      pid,
+      wins: parseInt(document.getElementById(`ew-m${mi+1}-p${i+1}`)?.value) || 0,
+    }));
+    mejaResults.push({ mejaNo: meja.mejaNo, players: entries.filter(e => e.pid) });
+  });
+
+  const tgl = document.getElementById('edit-sesi-tgl').value;
+  const dur = parseInt(document.getElementById('edit-sesi-dur').value) || 2;
+  const note = document.getElementById('edit-sesi-note').value;
+
+  const ok = await editSesiSave(currentEditId, { tgl, dur, note, mejaResults });
+  if(ok) {
+    closeModal('modal-edit-sesi');
+    showToast(`✓ Sesi #${currentEditId} berhasil diperbarui! Leaderboard direcalculate.`);
+  }
+}
+
+// ── OVERRIDE saveKas modal ──
+async function handleSaveKas() {
+  const modal = document.getElementById('modal-kas');
+  const inputs = modal.querySelectorAll('input,select');
+  const tgl   = inputs[0].value;
+  const tipe  = inputs[1].value === 'Pemasukan' ? 'in' : 'out';
+  const kat   = inputs[2].value;
+  const jml   = parseInt(inputs[3].value) || 0;
+  const desc  = inputs[4].value;
+
+  if(!tgl || !jml || !desc) { showToast('Lengkapi semua field'); return; }
+  const ok = await saveKasTx({ tgl, tipe, kategori: kat, jumlah: jml, desc });
+  if(ok) {
+    closeModal('modal-kas');
+    showToast('✓ Transaksi berhasil dicatat!');
+  }
+}
+
+// ── BOOT ──
+// Defer initApp until DOM + Supabase SDK ready
+window.addEventListener('DOMContentLoaded', () => {
+  // Override modal buttons to use Supabase versions
+  setTimeout(initApp, 100);
+});
+
+</script>
+</body>
+</html>

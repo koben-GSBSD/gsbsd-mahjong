@@ -307,9 +307,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     <div style="text-align:center;margin-bottom:32px">
       <div style="width:72px;height:72px;border-radius:16px;overflow:hidden;margin:0 auto 14px;border:2px solid var(--border);background:var(--card)">
         <img src="https://design.canva.ai/48fi2WAxiIZjr5P" style="width:100%;height:100%;object-fit:cover"
-          onerror="this.parentElement.innerHTML=\'<div style=font-size:36px;line-height:72px;text-align:center>🀄</div>\'">
+          onerror="this.parentElement.innerHTML='<div style=font-size:36px;line-height:72px;text-align:center>🀄</div>'">
       </div>
-      <div style="font-family:\'Noto Serif SC\',serif;font-size:20px;font-weight:700;color:var(--gold)">GMC</div>
+      <div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--gold)">GMC</div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">GSBSD Mahjong Community</div>
     </div>
     <!-- Form -->
@@ -322,13 +322,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
           <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Email</label>
           <input id="login-email" type="email" placeholder="email@example.com"
             style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:Inter,sans-serif;outline:none"
-            onkeydown="if(event.key===\'Enter\')doLogin()">
+            onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <div>
           <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Password</label>
           <input id="login-password" type="password" placeholder="••••••••"
             style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:Inter,sans-serif;outline:none"
-            onkeydown="if(event.key===\'Enter\')doLogin()">
+            onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <button onclick="doLogin()" id="login-btn"
           style="width:100%;padding:10px;background:var(--gold);color:#0f0e0d;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px;font-family:Inter,sans-serif">
@@ -345,7 +345,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 <!-- LOADING OVERLAY -->
 <div id="loading-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:8999;align-items:center;justify-content:center;flex-direction:column;gap:12px">
   <div style="font-size:36px">🀄</div>
-  <div style="font-family:\'Noto Serif SC\',serif;font-size:16px;color:var(--gold)">GSBSD Mahjong Community</div>
+  <div style="font-family:'Noto Serif SC',serif;font-size:16px;color:var(--gold)">GSBSD Mahjong Community</div>
   <div id="loading-msg" style="font-size:12px;color:var(--muted)">Memuat aplikasi...</div>
 </div>
 
@@ -409,15 +409,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 <!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="page-dashboard" class="page active">
   <div class="page-header">
-    <div><div class="page-title">Dashboard</div><div class="page-sub">Sabtu, 28 Juni 2026 · GMC — GSBSD Mahjong Community</div></div>
+    <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-date">GMC — GSBSD Mahjong Community</div></div>
   </div>
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">Total Member Aktif</div><div class="stat-value">24</div><div class="stat-change">↑ +3 bulan ini</div></div>
-    <div class="stat-card"><div class="stat-label">Sesi Bulan Ini</div><div class="stat-value">8</div><div class="stat-change">↑ +2 dari Mei</div></div>
+    <div class="stat-card"><div class="stat-label">Total Member Aktif</div><div class="stat-value" id="stat-members">–</div><div class="stat-change" id="stat-members-sub"></div></div>
+    <div class="stat-card"><div class="stat-label">Sesi Bulan Ini</div><div class="stat-value" id="stat-sessions">–</div><div class="stat-change" id="stat-sessions-sub"></div></div>
   </div>
   <div class="section">
     <div class="section-header">
-      <span class="section-title">🏆 Top 10 Leaderboard Bulan Ini</span>
+      <span class="section-title">🏆 Top 10 Leaderboard (All-Time)</span>
       <span class="btn btn-ghost btn-sm" onclick="nav('leaderboard',null)">Lihat Semua →</span>
     </div>
     <div class="card">
@@ -461,7 +461,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 <div id="page-leaderboard" class="page">
   <div class="page-header">
     <div><div class="page-title">Leaderboard</div><div class="page-sub">GSBSD Mahjong Community · Update otomatis tiap sesi dicatat</div></div>
-    <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print/PDF</button><button class="btn btn-ghost btn-sm">📤 Share</button></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print/PDF</button><button class="btn btn-ghost btn-sm" onclick="shareLeaderboard()">📤 Share</button></div>
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab(this,'tab-bulan')">Bulan Ini</button>
@@ -470,14 +470,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   </div>
   <div id="tab-bulan" class="tab-content active">
     <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="month-btn active">Juni 2026</button>
-      <button class="month-btn">Mei 2026</button>
-      <button class="month-btn">April 2026</button>
+      <span id="lb-month-buttons" style="display:contents"></span>
     </div>
-    <div class="podium">
-      <div class="podium-slot p2"><div class="podium-avatar">R</div><div class="podium-name">Rina W.</div><div class="podium-pts">24</div><div class="podium-plinth">2</div></div>
-      <div class="podium-slot p1"><div class="podium-avatar"><span class="crown">👑</span>A</div><div class="podium-name">Ahmad S.</div><div class="podium-pts">38</div><div class="podium-plinth">1</div></div>
-      <div class="podium-slot p3"><div class="podium-avatar">B</div><div class="podium-name">Budi H.</div><div class="podium-pts">19</div><div class="podium-plinth">3</div></div>
+    <div class="podium" id="podium" style="display:none">
     </div>
     <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Poin</th><th>Raja Meja 👑</th><th>Sesi</th><th>Win%</th><th>Streak</th><th>Tier</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div></div>
   </div>
@@ -485,10 +480,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Total Poin</th><th>Raja Meja 👑</th><th>Sesi</th><th>Win%</th><th>Tier</th><th>Progress</th></tr></thead><tbody id="alltime-body"></tbody></table></div></div>
   </div>
   <div id="tab-streak" class="tab-content">
-    <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Streak Juara Aktif</th><th>Best Streak</th></tr></thead><tbody>
-      <tr><td><span class="rank-num rank-1">1</span></td><td><div class="player-info"><div class="player-avatar" style="background:#4a3a1a;color:#FFD700">A</div><div class="player-name">Ahmad S.</div></div></td><td>🔥🔥🔥 3 sesi berturut</td><td>5×</td></tr>
-      <tr><td><span class="rank-num rank-2">2</span></td><td><div class="player-info"><div class="player-avatar" style="background:#1a3a2a;color:#2ecc71">R</div><div class="player-name">Rina W.</div></div></td><td>🔥🔥 2 sesi berturut</td><td>4×</td></tr>
-      <tr><td><span class="rank-num rank-3">3</span></td><td><div class="player-info"><div class="player-avatar" style="background:#1a2a3a;color:#3498db">B</div><div class="player-name">Budi H.</div></div></td><td>🔥 1 sesi</td><td>3×</td></tr>
+    <div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Streak Juara Aktif</th><th>Sesi</th></tr></thead><tbody id="streak-body">
     </tbody></table></div></div>
   </div>
 </div>
@@ -510,7 +502,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <div class="session-config">
     <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">⚙️ Konfigurasi Sesi</div>
     <div class="config-grid">
-      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" id="sesi-tgl" value="2026-06-28"></div>
+      <div class="form-group"><label class="form-label">Tanggal</label><input type="date" class="form-input" id="sesi-tgl"></div>
       <div class="form-group"><label class="form-label">Durasi (jam)</label><input type="number" class="form-input" id="sesi-dur" value="2" min="1" max="12"></div>
       <div class="form-group">
         <label class="form-label">Jumlah Meja</label>
@@ -563,7 +555,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
 <!-- ═══════════ RIWAYAT ═══════════ -->
 <div id="page-history" class="page">
-  <div class="page-header"><div><div class="page-title">Riwayat Sesi</div><div class="page-sub">Klik Edit untuk koreksi hasil & poin pemain</div></div><button class="btn btn-ghost btn-sm">Export CSV</button></div>
+  <div class="page-header"><div><div class="page-title">Riwayat Sesi</div><div class="page-sub">Klik Edit untuk koreksi hasil & poin pemain</div></div><button class="btn btn-ghost btn-sm" onclick="exportSessionsCsv()">Export CSV</button></div>
   <div class="notice-box" style="margin-bottom:16px;background:rgba(201,147,58,.07);border:1px solid rgba(201,147,58,.2);border-radius:8px;padding:11px 14px;font-size:12px;color:var(--text)">
     ✏️ <strong style="color:var(--gold)">Edit Sesi:</strong> Klik tombol Edit pada sesi yang ingin dikoreksi. Sistem akan recalculate poin semua pemain di sesi tersebut dan update leaderboard otomatis. Setiap perubahan dicatat di log.
   </div>
@@ -573,29 +565,27 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 <!-- ═══════════ KAS ═══════════ -->
 <div id="page-kas" class="page">
   <div class="page-header">
-    <div><div class="page-title">Kas Komunitas</div><div class="page-sub">Arus kas & alokasi dana · Juni 2026</div></div>
+    <div><div class="page-title">Kas Komunitas</div><div class="page-sub" id="kas-sub">Arus kas & alokasi dana</div></div>
     <div style="display:flex;gap:7px"><button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-kas')">+ Transaksi</button></div>
   </div>
   <div class="kas-summary">
-    <div class="kas-card"><div class="stat-label">Pemasukan</div><div class="kas-amount kas-in">Rp 2.440.000</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Juni 2026</div></div>
-    <div class="kas-card"><div class="stat-label">Pengeluaran</div><div class="kas-amount kas-out">Rp 1.200.000</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Juni 2026</div></div>
-    <div class="kas-card"><div class="stat-label">Saldo Bersih</div><div class="kas-amount kas-net">Rp 1.240.000</div><div style="font-size:11px;color:var(--gold);margin-top:3px">Hadiah: Rp 496.000</div></div>
+    <div class="kas-card"><div class="stat-label">Pemasukan</div><div class="kas-amount kas-in">Rp 0</div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="kas-in-sub"></div></div>
+    <div class="kas-card"><div class="stat-label">Pengeluaran</div><div class="kas-amount kas-out">Rp 0</div><div style="font-size:11px;color:var(--muted);margin-top:3px" id="kas-out-sub"></div></div>
+    <div class="kas-card"><div class="stat-label">Saldo Bersih</div><div class="kas-amount kas-net">Rp 0</div><div style="font-size:11px;color:var(--gold);margin-top:3px" id="kas-net-sub"></div></div>
   </div>
   <div class="card card-pad" style="margin-bottom:16px">
     <div class="section-title" style="margin-bottom:11px">Alokasi Saldo</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🏆 Hadiah (40%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#FFD700">Rp 496.000</div></div>
-      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🏦 Cadangan (30%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--green)">Rp 372.000</div></div>
-      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">⚙️ Operasional (20%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700">Rp 248.000</div></div>
-      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🎁 Mingguan (10%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--purple)">Rp 124.000</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🏆 Hadiah (40%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#FFD700" id="alok-hadiah">Rp 0</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🏦 Cadangan (30%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--green)" id="alok-cadangan">Rp 0</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">⚙️ Operasional (20%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700" id="alok-operasional">Rp 0</div></div>
+      <div style="text-align:center;padding:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">🎁 Mingguan (10%)</div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--purple)" id="alok-mingguan">Rp 0</div></div>
     </div>
   </div>
   <div class="card">
     <div class="filter-bar">
       <span style="font-size:11px;color:var(--muted)">📅</span>
-      <button class="month-btn active" onclick="filterKas('Juni 2026',this)">Juni 2026</button>
-      <button class="month-btn" onclick="filterKas('Mei 2026',this)">Mei 2026</button>
-      <button class="month-btn" onclick="filterKas('April 2026',this)">April 2026</button>
+      <span id="kas-month-buttons" style="display:contents"></span>
       <button class="month-btn" onclick="filterKas('all',this)">Semua</button>
       <span style="flex:1"></span>
       <select class="form-select" style="width:auto;font-size:12px;padding:4px 9px" onchange="filterKasType(this.value)"><option value="">Semua</option><option value="in">Masuk</option><option value="out">Keluar</option></select>
@@ -1079,50 +1069,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
 <script>
 // ── DATA PEMAIN (sorted A-Z) ──
-const players = [
-  {id:1,name:'Ahmad Setiawan',nick:'Ahmad S.',avatar:'A',color:'#4a3a1a',ac:'#FFD700',joined:'2026-01-10',wa:'081234567890',pts:38,wins:10,games:14,status:'Aktif',streak:3,notes:'Berpengalaman'},
-  {id:2,name:'Agus Riyanto',nick:'Agus R.',avatar:'Ag',color:'#1a3a1a',ac:'#8bc34a',joined:'2026-05-01',wa:'089012345678',pts:3,wins:0,games:3,status:'Aktif',streak:0,notes:'Pemula'},
-  {id:3,name:'Budi Hartono',nick:'Budi H.',avatar:'B',color:'#1a2a3a',ac:'#3498db',joined:'2026-02-01',wa:'083456789012',pts:19,wins:5,games:11,status:'Aktif',streak:1,notes:''},
-  {id:4,name:'Deni Kusuma',nick:'Deni K.',avatar:'D',color:'#2a3a1a',ac:'#8bc34a',joined:'2026-03-05',wa:'085678901234',pts:11,wins:3,games:9,status:'Aktif',streak:0,notes:''},
-  {id:5,name:'Dewi Cahyani',nick:'Dewi C.',avatar:'Dw',color:'#3a1a3a',ac:'#e91e63',joined:'2026-05-10',wa:'080123456789',pts:2,wins:0,games:2,status:'Aktif',streak:0,notes:'Pemula'},
-  {id:6,name:'Hendra Taufik',nick:'Hendra T.',avatar:'H',color:'#1a3a3a',ac:'#00bcd4',joined:'2026-04-01',wa:'087890123456',pts:6,wins:2,games:7,status:'Aktif',streak:0,notes:'Pemula'},
-  {id:7,name:'Lisa Permata',nick:'Lisa P.',avatar:'L',color:'#2a1a1a',ac:'#ff5722',joined:'2026-04-15',wa:'081345678901',pts:5,wins:1,games:5,status:'Aktif',streak:0,notes:''},
-  {id:8,name:'Maya Lestari',nick:'Maya L.',avatar:'M',color:'#2a1a3a',ac:'#9c27b0',joined:'2026-04-20',wa:'088901234567',pts:4,wins:1,games:5,status:'Tidak Aktif',streak:0,notes:''},
-  {id:9,name:'Putri Andini',nick:'Putri A.',avatar:'P',color:'#3a2a1a',ac:'#ff9800',joined:'2026-03-12',wa:'086789012345',pts:9,wins:2,games:8,status:'Aktif',streak:1,notes:''},
-  {id:10,name:'Rina Wulandari',nick:'Rina W.',avatar:'R',color:'#1a3a2a',ac:'#2ecc71',joined:'2026-01-15',wa:'082345678901',pts:24,wins:6,games:12,status:'Aktif',streak:2,notes:''},
-  {id:11,name:'Sari Dewi',nick:'Sari D.',avatar:'S',color:'#3a1a2a',ac:'#e91e63',joined:'2026-02-10',wa:'084567890123',pts:14,wins:4,games:10,status:'Aktif',streak:0,notes:'Pemula'},
-  {id:12,name:'Tono Jaya',nick:'Tono J.',avatar:'T',color:'#1a1a3a',ac:'#673ab7',joined:'2026-04-05',wa:'082456789012',pts:7,wins:2,games:6,status:'Aktif',streak:0,notes:''},
-].sort((a,b)=>a.nick.localeCompare(b.nick,'id'));
+const players = [];
 
-const sesiData = [
-  {id:8,tgl:'2026-06-22',tglStr:'22 Jun 2026',dur:3,meja:2,pemain:8,note:'Sesi rutin Sabtu',edited:false,editLog:'',
-   hasil:[
-    {mejaNo:1,players:[{pid:1,wins:4},{pid:10,wins:3},{pid:3,wins:1},{pid:11,wins:0}]},
-    {mejaNo:2,players:[{pid:4,wins:3},{pid:6,wins:2},{pid:9,wins:1},{pid:7,wins:0}]}]},
-  {id:7,tgl:'2026-06-15',tglStr:'15 Jun 2026',dur:2,meja:2,pemain:8,note:'',edited:false,editLog:'',
-   hasil:[
-    {mejaNo:1,players:[{pid:10,wins:3},{pid:1,wins:2},{pid:11,wins:1},{pid:9,wins:0}]},
-    {mejaNo:2,players:[{pid:6,wins:2},{pid:4,wins:2},{pid:7,wins:1},{pid:8,wins:0}]}]},
-  {id:6,tgl:'2026-06-08',tglStr:'8 Jun 2026',dur:2,meja:1,pemain:4,note:'Sesi kecil',edited:true,editLog:'Diedit 10 Jun 2026',
-   hasil:[
-    {mejaNo:1,players:[{pid:1,wins:3},{pid:3,wins:2},{pid:10,wins:1},{pid:11,wins:0}]}]},
-  {id:5,tgl:'2026-06-01',tglStr:'1 Jun 2026',dur:3,meja:2,pemain:8,note:'',edited:false,editLog:'',
-   hasil:[
-    {mejaNo:1,players:[{pid:1,wins:4},{pid:10,wins:2},{pid:3,wins:1},{pid:9,wins:0}]},
-    {mejaNo:2,players:[{pid:4,wins:3},{pid:11,wins:2},{pid:6,wins:1},{pid:7,wins:0}]}]},
-];
-
-const kasData=[
-  {date:'28 Jun 2026',month:'Juni 2026',desc:'Iuran sesi #9 - 8 pemain',cat:'Iuran Sesi',type:'in',amt:320000,saldo:1240000},
-  {date:'28 Jun 2026',month:'Juni 2026',desc:'Sewa meja 2 jam x 2 meja',cat:'Sewa Venue',type:'out',amt:200000,saldo:920000},
-  {date:'22 Jun 2026',month:'Juni 2026',desc:'Iuran sesi #8 - 8 pemain',cat:'Iuran Sesi',type:'in',amt:320000,saldo:1120000},
-  {date:'22 Jun 2026',month:'Juni 2026',desc:'Sewa meja 3 jam x 2 meja',cat:'Sewa Venue',type:'out',amt:300000,saldo:800000},
-  {date:'15 Jun 2026',month:'Juni 2026',desc:'Iuran member bulk Juni',cat:'Iuran Member',type:'in',amt:600000,saldo:1100000},
-  {date:'10 Jun 2026',month:'Juni 2026',desc:'Hadiah mingguan sesi #7',cat:'Hadiah Mingguan',type:'out',amt:100000,saldo:500000},
-  {date:'25 Mei 2026',month:'Mei 2026',desc:'Iuran sesi #6',cat:'Iuran Sesi',type:'in',amt:320000,saldo:780000},
-  {date:'20 Mei 2026',month:'Mei 2026',desc:'Hadiah bulanan Mei',cat:'Hadiah Bulanan',type:'out',amt:300000,saldo:460000},
-  {date:'5 Apr 2026',month:'April 2026',desc:'Iuran sesi #3',cat:'Iuran Sesi',type:'in',amt:200000,saldo:440000},
-];
+const kasData = [];
 
 // ── TIER ──
 function getTier(p){return p>=110?'S':p>=55?'A':p>=20?'B':'C'}
@@ -1470,7 +1419,7 @@ function openEditPlayer(id){
 }
 
 // ── KAS ──
-let kasMonth='Juni 2026',kasType='';
+let kasMonth='all',kasType='';
 function renderKas(){
   const data=kasData.filter(tx=>(kasMonth==='all'||tx.month===kasMonth)&&(!kasType||tx.type===kasType));
   document.getElementById('kas-body').innerHTML=data.length?data.map(tx=>`<tr>
@@ -2148,6 +2097,235 @@ window.addEventListener('DOMContentLoaded', () => {
   // Override modal buttons to use Supabase versions
   setTimeout(initApp, 100);
 });
+
+</script>
+<script>
+
+// ═══ GMC PATCH — data dinamis, perbaikan poin & kas (2026-07-02) ═══
+const GMC_MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+function gmcMonthStr(d){return GMC_MONTHS[d.getMonth()]+' '+d.getFullYear();}
+function gmcLastMonths(n){const out=[];const now=new Date();for(let i=0;i<n;i++){out.push(gmcMonthStr(new Date(now.getFullYear(),now.getMonth()-i,1)));}return out;}
+function gmcFmtRp(n){return 'Rp '+Math.round(n||0).toLocaleString('id-ID');}
+let lbMonth=gmcLastMonths(1)[0];
+
+function updateDashStats(){
+  const hari=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const now=new Date();
+  const dd=document.getElementById('dash-date');
+  if(dd)dd.textContent=hari[now.getDay()]+', '+now.getDate()+' '+gmcMonthStr(now)+' · GMC — GSBSD Mahjong Community';
+  const aktif=players.filter(p=>p.status==='Aktif').length;
+  const em=document.getElementById('stat-members');if(em)em.textContent=aktif;
+  const ems=document.getElementById('stat-members-sub');if(ems)ems.textContent=players.length+' pemain terdaftar';
+  const cur=gmcMonthStr(now);
+  const sd=(typeof sesiData!=='undefined')?sesiData:[];
+  const n=sd.filter(x=>gmcMonthStr(new Date(x.tgl))===cur).length;
+  const es=document.getElementById('stat-sessions');if(es)es.textContent=n;
+  const ess=document.getElementById('stat-sessions-sub');if(ess)ess.textContent=n>0?('bulan '+GMC_MONTHS[now.getMonth()]):'belum ada sesi bulan ini';
+  const st=document.getElementById('sesi-tgl');if(st&&!st.value)st.value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+}
+
+function gmcMonthlyStats(mStr){
+  const map={};
+  const sd=(typeof sesiData!=='undefined')?sesiData:[];
+  sd.forEach(sx=>{
+    if(gmcMonthStr(new Date(sx.tgl))!==mStr)return;
+    (sx.hasil||[]).forEach(mj=>{
+      const ps=mj.players||[];
+      const tg=ps.reduce((t,r)=>t+(r.wins||0),0);
+      ps.forEach(r=>{
+        const pid=(r.pid!==undefined&&r.pid!==null)?r.pid:r.id;
+        if(pid==null)return;
+        if(!map[pid])map[pid]={pts:0,raja:0,sesi:0,wins:0,tg:0};
+        map[pid].pts+=(r.poin!==undefined?r.poin:(r.pts||0));
+        map[pid].wins+=(r.wins||0);
+        map[pid].tg+=tg;
+        map[pid].sesi+=1;
+        if(String(r.posisi||r.label||'').includes('Juara'))map[pid].raja+=1;
+      });
+    });
+  });
+  return map;
+}
+function renderPodium(mStr){
+  const pod=document.getElementById('podium');if(!pod)return;
+  const stats=gmcMonthlyStats(mStr);
+  const rows=Object.entries(stats).map(([pid,st])=>{const p=getPlayerById(parseInt(pid));return p?{p,pts:st.pts}:null;}).filter(Boolean).sort((x,y)=>y.pts-x.pts);
+  if(rows.length===0){pod.style.display='none';pod.innerHTML='';return;}
+  const t=[rows[1],rows[0],rows[2]];const cls=['p2','p1','p3'];const pl=[2,1,3];
+  pod.innerHTML=t.map((r,i)=>r?('<div class="podium-slot '+cls[i]+'"><div class="podium-avatar">'+(i===1?'<span class="crown">👑</span>':'')+r.p.avatar+'</div><div class="podium-name">'+r.p.nick+'</div><div class="podium-pts">'+r.pts+'</div><div class="podium-plinth">'+pl[i]+'</div></div>'):'<div class="podium-slot"></div>').join('');
+  pod.style.display='flex';
+}
+function renderMonthlyLb(){
+  const tb=document.getElementById('leaderboard-body');if(!tb)return;
+  const stats=gmcMonthlyStats(lbMonth);
+  const rows=Object.entries(stats).map(([pid,st])=>{const p=getPlayerById(parseInt(pid));return p?Object.assign({p:p},st):null;}).filter(Boolean).sort((x,y)=>y.pts-x.pts);
+  if(rows.length===0){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">Belum ada sesi di bulan '+lbMonth+'</td></tr>';return;}
+  tb.innerHTML=rows.map((r,i)=>{
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const wp=r.tg>0?Math.round(r.wins/r.tg*100)+'%':'–';
+    const t=getTier(r.p.pts);
+    return '<tr><td><span class="rank-num '+rc+'">'+(i+1)+'</span></td><td><div class="player-info"><div class="player-avatar" style="background:'+r.p.color+';color:'+r.p.ac+'">'+r.p.avatar+'</div><div class="player-name">'+r.p.nick+'</div></div></td><td><span class="points-val">'+r.pts+'</span></td><td style="font-family:\'JetBrains Mono\',monospace">'+r.raja+'</td><td style="font-family:\'JetBrains Mono\',monospace">'+r.sesi+'</td><td style="font-family:\'JetBrains Mono\',monospace">'+wp+'</td><td>'+((r.p.streak||0)>0?'🔥'+r.p.streak:'–')+'</td><td>'+getTierBadge(t)+'</td></tr>';
+  }).join('');
+}
+function setLbMonth(m,btn){lbMonth=m;document.querySelectorAll('#lb-month-buttons .month-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderMonthlyLb();renderPodium(m);}
+function buildLbMonthButtons(){
+  const el=document.getElementById('lb-month-buttons');if(!el)return;
+  el.innerHTML=gmcLastMonths(3).map((m,i)=>'<button class="month-btn'+(m===lbMonth?' active':'')+'" onclick="setLbMonth(\''+m+'\',this)">'+m+'</button>').join('');
+}
+function renderStreak(){
+  const tb=document.getElementById('streak-body');if(!tb)return;
+  const rows=players.filter(p=>(p.streak||0)>0).sort((x,y)=>(y.streak||0)-(x.streak||0)).slice(0,10);
+  if(rows.length===0){tb.innerHTML='<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--muted)">Belum ada streak aktif — streak bertambah saat pemain jadi Raja Meja 🥇 beberapa sesi berturut-turut</td></tr>';return;}
+  tb.innerHTML=rows.map((p,i)=>'<tr><td><span class="rank-num '+(i<3?('rank-'+(i+1)):'')+'">'+(i+1)+'</span></td><td><div class="player-info"><div class="player-avatar" style="background:'+p.color+';color:'+p.ac+'">'+p.avatar+'</div><div class="player-name">'+p.nick+'</div></div></td><td>'+'🔥'.repeat(Math.min(p.streak,5))+' '+p.streak+' sesi berturut</td><td style="font-family:\'JetBrains Mono\',monospace">'+(p.games||0)+'</td></tr>').join('');
+}
+function shareLeaderboard(){
+  const url='https://www.gsbsdmahjong.my.id/?view=public';
+  if(navigator.share){navigator.share({title:'Leaderboard GMC — GSBSD Mahjong Community',url:url}).catch(function(){});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){showToast('🔗 Link leaderboard publik disalin ke clipboard!');}).catch(function(){showToast(url);});}
+  else{showToast(url);}
+}
+function exportSessionsCsv(){
+  const sd=(typeof sesiData!=='undefined')?sesiData:[];
+  const rows=[['Sesi','Tanggal','Meja','Durasi (jam)','Pemain','Menang','Poin','Posisi']];
+  sd.forEach(sx=>{(sx.hasil||[]).forEach(mj=>{(mj.players||[]).forEach(r=>{
+    const pid=(r.pid!==undefined&&r.pid!==null)?r.pid:r.id;
+    const p=getPlayerById(parseInt(pid));
+    rows.push(['#'+sx.id,sx.tgl,'Meja '+mj.mejaNo,sx.dur,p?p.nick:pid,(r.wins||0),(r.poin!==undefined?r.poin:r.pts||0),String(r.posisi||r.label||'')]);
+  });});});
+  if(rows.length===1){showToast('Belum ada data sesi untuk diexport');return;}
+  const csv=rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='gmc-riwayat-sesi.csv';a.click();
+}
+
+// ── KAS: bulan dinamis (nama panjang) + ringkasan & alokasi dinamis ──
+async function loadKas(){
+  if(!sb||!currentUserId)return;
+  if(!window.__kasInit){window.__kasInit=true;kasMonth=gmcMonthStr(new Date());}
+  const r=await sb.from('gmc_kas').select('*').eq('user_id',currentUserId).order('tgl',{ascending:false});
+  if(r.error){console.error('loadKas:',r.error);return;}
+  kasData.length=0;
+  (r.data||[]).forEach(tx=>{
+    const d=new Date(tx.tgl);
+    kasData.push({date:d.getDate()+' '+GMC_MONTHS[d.getMonth()].slice(0,3)+' '+d.getFullYear(),month:gmcMonthStr(d),desc:tx.deskripsi,cat:tx.kategori,type:tx.tipe,amt:tx.jumlah,saldo:tx.saldo});
+  });
+  buildKasMonthButtons();renderKas();updateKasSummary();
+}
+function buildKasMonthButtons(){
+  const el=document.getElementById('kas-month-buttons');if(!el)return;
+  el.innerHTML=gmcLastMonths(3).map(m=>'<button class="month-btn'+(m===kasMonth?' active':'')+'" onclick="filterKas(\''+m+'\',this)">'+m+'</button>').join('');
+}
+function filterKas(m,btn){kasMonth=m;document.querySelectorAll('#page-kas .month-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderKas();updateKasSummary();}
+function updateKasSummary(){
+  const sel=(kasMonth==='all')?null:kasMonth;
+  const rows=kasData.filter(tx=>!sel||tx.month===sel);
+  const tin=rows.filter(t=>t.type==='in').reduce((a,t)=>a+(t.amt||0),0);
+  const tout=rows.filter(t=>t.type==='out').reduce((a,t)=>a+(t.amt||0),0);
+  const saldo=kasData.length>0?(kasData[0].saldo||0):0;
+  const lbl=sel||'Semua periode';
+  const q=(qq,v)=>{const e=document.querySelector(qq);if(e)e.textContent=v;};
+  const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  q('.kas-amount.kas-in',gmcFmtRp(tin));q('.kas-amount.kas-out',gmcFmtRp(tout));q('.kas-amount.kas-net',gmcFmtRp(saldo));
+  g('kas-in-sub',lbl);g('kas-out-sub',lbl);g('kas-net-sub','Hadiah: '+gmcFmtRp(saldo*0.4));
+  g('alok-hadiah',gmcFmtRp(saldo*0.4));g('alok-cadangan',gmcFmtRp(saldo*0.3));g('alok-operasional',gmcFmtRp(saldo*0.2));g('alok-mingguan',gmcFmtRp(saldo*0.1));
+  g('kas-sub','Arus kas & alokasi dana · '+lbl);
+}
+
+// ── SAVE SESSION: fix hitungan Raja Meja + streak + bonus kehadiran ──
+async function saveSession(formData){
+  if(!currentUserId)return false;
+  const tgl=formData.tgl,dur=formData.dur,mejaCount=formData.mejaCount,note=formData.note,mejaResults=formData.mejaResults;
+  const ins=await sb.from('gmc_sessions').insert({user_id:currentUserId,tgl:tgl,dur:dur,jumlah_meja:mejaCount,jumlah_pemain:mejaResults.reduce((a,m)=>a+m.players.filter(p=>p.pid).length,0),note:note}).select().single();
+  if(ins.error){showToast('Error simpan sesi: '+ins.error.message);return false;}
+  const sessionId=ins.data.id;
+  const resultRows=[];const playerUpdates={};const rajaSet=new Set();
+  for(const meja of mejaResults){
+    const entries=meja.players.filter(p=>p.pid);
+    const computed=calcPoinMeja(entries);
+    for(const r of computed){
+      if(!r.pid)continue;
+      resultRows.push({session_id:sessionId,meja_no:meja.mejaNo,player_id:r.pid,wins:r.wins,poin:r.pts,posisi:r.label});
+      if(!playerUpdates[r.pid])playerUpdates[r.pid]={pts:0,wins:0,games:0};
+      playerUpdates[r.pid].pts+=r.pts;
+      playerUpdates[r.pid].games+=1;
+      if(String(r.label||'').includes('Juara')){playerUpdates[r.pid].wins+=1;rajaSet.add(r.pid);}
+    }
+  }
+  if(resultRows.length>0){
+    const rr=await sb.from('gmc_session_results').insert(resultRows);
+    if(rr.error){showToast('Error simpan hasil: '+rr.error.message);return false;}
+  }
+  const mStr=gmcMonthStr(new Date(tgl));
+  const attend={};
+  ((typeof sesiData!=='undefined')?sesiData:[]).forEach(sx=>{
+    if(gmcMonthStr(new Date(sx.tgl))!==mStr)return;
+    (sx.hasil||[]).forEach(mj=>(mj.players||[]).forEach(r=>{const pid=(r.pid!==undefined&&r.pid!==null)?r.pid:r.id;if(pid!=null)attend[pid]=(attend[pid]||0)+1;}));
+  });
+  for(const pid of Object.keys(playerUpdates)){
+    const delta=playerUpdates[pid];
+    const player=players.find(p=>p.id===parseInt(pid));
+    if(!player)continue;
+    let bonus=0;
+    const newStreak=rajaSet.has(parseInt(pid))?((player.streak||0)+1):0;
+    if(newStreak>0&&newStreak%3===0)bonus+=2;
+    if(((attend[pid]||0)+1)===4)bonus+=3;
+    const upd={pts:(player.pts||0)+delta.pts+bonus,wins:(player.wins||0)+delta.wins,games:(player.games||0)+delta.games,streak:newStreak,updated_at:new Date().toISOString()};
+    let u=await sb.from('gmc_players').update(upd).eq('id',parseInt(pid));
+    if(u.error){delete upd.streak;u=await sb.from('gmc_players').update(upd).eq('id',parseInt(pid));}
+    if(u.error)console.error('update player:',u.error);
+  }
+  await loadAllData();
+  return true;
+}
+
+// ── EDIT SESI: recalculate dengan hitungan Raja Meja yang benar ──
+async function editSesiSave(sessionId,formData){
+  if(!currentUserId)return false;
+  const tgl=formData.tgl,dur=formData.dur,note=formData.note,mejaResults=formData.mejaResults;
+  const old=await sb.from('gmc_session_results').select('player_id,poin').eq('session_id',sessionId);
+  await sb.from('gmc_session_results').delete().eq('session_id',sessionId);
+  const resultRows=[];const newPids=new Set();
+  for(const meja of mejaResults){
+    const entries=meja.players.filter(p=>p.pid);
+    const computed=calcPoinMeja(entries);
+    for(const r of computed){
+      if(!r.pid)continue;
+      resultRows.push({session_id:sessionId,meja_no:meja.mejaNo,player_id:r.pid,wins:r.wins,poin:r.pts,posisi:r.label});
+      newPids.add(r.pid);
+    }
+  }
+  if(resultRows.length>0){
+    const rr=await sb.from('gmc_session_results').insert(resultRows);
+    if(rr.error){showToast('Error simpan hasil: '+rr.error.message);return false;}
+  }
+  await sb.from('gmc_sessions').update({tgl:tgl,dur:dur,note:note,edited:true,edit_log:'Diedit '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}).eq('id',sessionId);
+  const allPids=new Set((old.data||[]).map(r=>r.player_id));newPids.forEach(p=>allPids.add(p));
+  for(const pid of allPids){
+    const ar=await sb.from('gmc_session_results').select('poin,posisi').eq('player_id',pid);
+    const totalPts=(ar.data||[]).reduce((a,r)=>a+(r.poin||0),0);
+    const totalWins=(ar.data||[]).filter(r=>String(r.posisi||'').includes('Juara')).length;
+    const totalGames=(ar.data||[]).length;
+    const u=await sb.from('gmc_players').update({pts:totalPts,wins:totalWins,games:totalGames,updated_at:new Date().toISOString()}).eq('id',pid);
+    if(u.error)console.error('recalc player:',u.error);
+  }
+  await loadAllData();
+  return true;
+}
+
+// ── Wrappers: render turunan setiap data berubah ──
+const __oLb=renderLeaderboard;
+renderLeaderboard=function(){
+  try{__oLb();}catch(e){console.error(e);}
+  try{buildLbMonthButtons();renderMonthlyLb();renderPodium(lbMonth);renderStreak();updateDashStats();}catch(e){console.error(e);}
+};
+const __oHist=renderHistory;
+renderHistory=function(){
+  try{__oHist();}catch(e){console.error(e);}
+  try{renderMonthlyLb();renderPodium(lbMonth);updateDashStats();}catch(e){console.error(e);}
+};
+window.setLbMonth=setLbMonth;window.shareLeaderboard=shareLeaderboard;window.exportSessionsCsv=exportSessionsCsv;window.filterKas=filterKas;
+document.addEventListener('DOMContentLoaded',function(){try{updateDashStats();buildLbMonthButtons();renderMonthlyLb();renderPodium(lbMonth);renderStreak();}catch(e){console.error(e);}});
 
 </script>
 </body>

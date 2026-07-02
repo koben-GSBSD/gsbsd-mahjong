@@ -147,7 +147,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 /* ── SESSION FORM A+ ── */
 .session-config{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px}
 .config-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.meja-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.meja-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:visible}
 .meja-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
 .meja-title{font-size:13px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
 .meja-total{font-size:12px;color:var(--muted)}
@@ -269,7 +269,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .player-search-wrap{position:relative}
 .player-search-input{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;transition:border .15s;width:100%}
 .player-search-input:focus{border-color:var(--gold)}
-.player-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--card);border:1px solid var(--gold);border-radius:8px;z-index:500;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.player-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--card);border:1px solid var(--gold);border-radius:8px;z-index:500;max-height:280px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .player-dropdown.open{display:block}
 .player-dropdown-item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(46,42,38,.4)}
 .player-dropdown-item:last-child{border-bottom:none}
@@ -606,7 +606,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Batas Runner-up (menang ≥ X game)</label><input type="number" class="form-input" value="2"></div>
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Bonus Streak Juara (3 sesi berturut)</label><input type="number" class="form-input" value="2"></div>
       <div class="form-group" style="margin-bottom:14px"><label class="form-label">Bonus Kehadiran Rutin (4 sesi/bulan)</label><input type="number" class="form-input" value="3"></div>
-      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Sistem poin disimpan')">Simpan</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettingsPoin()">Simpan</button>
     </div>
     <div class="card card-pad">
       <div class="section-title" style="margin-bottom:14px">Batas Tier</div>
@@ -616,7 +616,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="form-group" style="margin-bottom:14px"><label class="form-label">👀 Si Baru Belajar · Tier C (default)</label><input type="number" class="form-input" value="0" disabled></div>
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Decay setelah absen (bulan)</label><input type="number" class="form-input" value="2"></div>
       <div class="form-group" style="margin-bottom:14px"><label class="form-label">Turun tier sebanyak (level)</label><input type="number" class="form-input" value="1"></div>
-      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Batas tier disimpan')">Simpan</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettingsTier()">Simpan</button>
     </div>
     <div class="card card-pad">
       <div class="section-title" style="margin-bottom:14px">Alokasi Kas (%)</div>
@@ -624,7 +624,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Kas Cadangan</label><input type="number" class="form-input" value="30"></div>
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Operasional</label><input type="number" class="form-input" value="20"></div>
       <div class="form-group" style="margin-bottom:14px"><label class="form-label">Hadiah Mingguan</label><input type="number" class="form-input" value="10"></div>
-      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Alokasi kas disimpan')">Simpan</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettingsAlokasi()">Simpan</button>
     </div>
     <div class="card card-pad">
       <div class="section-title" style="margin-bottom:14px">Info Komunitas</div>
@@ -633,7 +633,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Nama Host</label><input type="text" class="form-input" value="Koben"></div>
       <div class="form-group" style="margin-bottom:10px"><label class="form-label">Harga Sewa/Jam (Rp)</label><input type="number" class="form-input" value="65000"></div>
       <div class="form-group" style="margin-bottom:14px"><label class="form-label">Paket 10 Jam (Rp)</label><input type="number" class="form-input" value="500000"></div>
-      <button class="btn btn-primary btn-sm" onclick="showToast('✓ Info komunitas disimpan')">Simpan</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettingsInfo()">Simpan</button>
     </div>
   </div>
 </div>
@@ -2327,6 +2327,249 @@ renderHistory=function(){
 };
 window.setLbMonth=setLbMonth;window.shareLeaderboard=shareLeaderboard;window.exportSessionsCsv=exportSessionsCsv;window.filterKas=filterKas;
 document.addEventListener('DOMContentLoaded',function(){try{updateDashStats();buildLbMonthButtons();renderMonthlyLb();renderPodium(lbMonth);renderStreak();}catch(e){console.error(e);}});
+
+</script>
+<script>
+
+// ═══ GMC PATCH v3 — pengaturan persist, bonus persist, halaman publik, nick unik ═══
+var GMC_CFG={raja:3,runner:2,dasar:1,runnerMin:2,streakBonus:2,hadirBonus:3,hadirSesi:4,tierS:110,tierA:55,tierB:20,alokHadiah:40,alokCadangan:30,alokOperasional:20,alokMingguan:10,nama:'GSBSD Mahjong Community',singkatan:'GMC',host:'Koben',sewa:65000,paket:500000};
+
+function calcPoinMeja(entries){
+  const wins=entries.map(e=>e.wins);
+  const maxW=Math.max(...wins);
+  const topCount=wins.filter(w=>w===maxW).length;
+  const C=GMC_CFG;
+  return entries.map(e=>{
+    const w=e.wins;
+    if(maxW===0)return Object.assign({},e,{pts:C.dasar,label:'⬜ Hadir',cls:'poin-hadir',rcClass:'rc-4'});
+    if(w===maxW){
+      if(topCount===1)return Object.assign({},e,{pts:C.raja,label:'🥇 Juara',cls:'poin-juara',rcClass:'rc-1'});
+      if(topCount===2)return Object.assign({},e,{pts:C.runner,label:'🥈 Seri Top',cls:'poin-runner2',rcClass:'rc-2'});
+      return Object.assign({},e,{pts:C.dasar,label:'⬜ Seri',cls:'poin-hadir',rcClass:'rc-4'});
+    }
+    if(w>=C.runnerMin)return Object.assign({},e,{pts:C.runner,label:'🥈 Runner-up',cls:'poin-runner2',rcClass:'rc-2'});
+    if(w>=1)return Object.assign({},e,{pts:C.dasar,label:'🥉 3rd',cls:'poin-runner1',rcClass:'rc-3'});
+    return Object.assign({},e,{pts:C.dasar,label:'⬜ Hadir',cls:'poin-hadir',rcClass:'rc-4'});
+  });
+}
+function getTier(p){const C=GMC_CFG;return p>=C.tierS?'S':p>=C.tierA?'A':p>=C.tierB?'B':'C'}
+
+async function loadSettings(){
+  if(!sb||!currentUserId)return;
+  try{
+    const r=await sb.from('gmc_settings').select('value').eq('user_id',currentUserId).eq('key','cfg').maybeSingle();
+    if(r.data&&r.data.value)Object.assign(GMC_CFG,r.data.value);
+  }catch(e){console.error('loadSettings:',e);}
+}
+async function persistSettings(){
+  if(!sb||!currentUserId)return false;
+  const r=await sb.from('gmc_settings').upsert({user_id:currentUserId,key:'cfg',value:GMC_CFG,updated_at:new Date().toISOString()},{onConflict:'user_id,key'});
+  if(r.error){showToast('Error simpan pengaturan: '+r.error.message);return false;}
+  return true;
+}
+function settingsCards(){return document.querySelectorAll('#page-settings .card-pad');}
+function gmcSetVal(cards,c,i,v){const inp=cards[c]&&cards[c].querySelectorAll('input')[i];if(inp)inp.value=v;}
+function gmcGetVal(c,i,def){const cards=settingsCards();const inp=cards[c]&&cards[c].querySelectorAll('input')[i];const v=inp?parseFloat(inp.value):NaN;return isNaN(v)?def:v;}
+function fillSettingsUI(){
+  const cards=settingsCards();if(!cards.length)return;const C=GMC_CFG;
+  gmcSetVal(cards,0,0,C.raja);gmcSetVal(cards,0,1,C.runner);gmcSetVal(cards,0,2,C.dasar);gmcSetVal(cards,0,3,C.runnerMin);gmcSetVal(cards,0,4,C.streakBonus);gmcSetVal(cards,0,5,C.hadirBonus);
+  gmcSetVal(cards,1,0,C.tierS);gmcSetVal(cards,1,1,C.tierA);gmcSetVal(cards,1,2,C.tierB);
+  gmcSetVal(cards,2,0,C.alokHadiah);gmcSetVal(cards,2,1,C.alokCadangan);gmcSetVal(cards,2,2,C.alokOperasional);gmcSetVal(cards,2,3,C.alokMingguan);
+  const t=cards[3]?cards[3].querySelectorAll('input'):[];
+  if(t[0])t[0].value=C.nama;if(t[1])t[1].value=C.singkatan;if(t[2])t[2].value=C.host;if(t[3])t[3].value=C.sewa;if(t[4])t[4].value=C.paket;
+  const tj=document.querySelectorAll('.tj-item .tj-pts');
+  if(tj.length===4){tj[0].textContent='0 – '+(C.tierB-1);tj[1].textContent=C.tierB+' – '+(C.tierA-1);tj[2].textContent=C.tierA+' – '+(C.tierS-1);tj[3].textContent=C.tierS+'+';}
+  const pl=document.querySelectorAll('.pl-item .pl-pts');
+  if(pl.length===4){pl[0].textContent='+'+C.raja;pl[1].textContent='+'+C.runner;pl[2].textContent='+'+C.dasar;pl[3].textContent='+'+C.dasar;}
+}
+function applyBranding(){const C=GMC_CFG;const ln=document.querySelector('.logo-name');if(ln)ln.textContent=C.singkatan;const ls=document.querySelector('.logo-sub');if(ls)ls.textContent=C.nama;const hn=document.querySelector('.host-name');if(hn)hn.textContent=C.host;}
+async function saveSettingsPoin(){const C=GMC_CFG;C.raja=gmcGetVal(0,0,C.raja);C.runner=gmcGetVal(0,1,C.runner);C.dasar=gmcGetVal(0,2,C.dasar);C.runnerMin=gmcGetVal(0,3,C.runnerMin);C.streakBonus=gmcGetVal(0,4,C.streakBonus);C.hadirBonus=gmcGetVal(0,5,C.hadirBonus);if(await persistSettings()){fillSettingsUI();showToast('✓ Sistem poin disimpan & langsung berlaku untuk sesi berikutnya');}}
+async function saveSettingsTier(){const C=GMC_CFG;C.tierS=gmcGetVal(1,0,C.tierS);C.tierA=gmcGetVal(1,1,C.tierA);C.tierB=gmcGetVal(1,2,C.tierB);if(await persistSettings()){fillSettingsUI();try{renderLeaderboard();renderPlayers();renderDashTop5();}catch(e){}showToast('✓ Batas tier disimpan & diterapkan');}}
+async function saveSettingsAlokasi(){const C=GMC_CFG;const a=gmcGetVal(2,0,C.alokHadiah),b=gmcGetVal(2,1,C.alokCadangan),c=gmcGetVal(2,2,C.alokOperasional),d=gmcGetVal(2,3,C.alokMingguan);if(Math.round(a+b+c+d)!==100){showToast('⚠️ Total alokasi harus 100% (sekarang '+(a+b+c+d)+'%)');return;}C.alokHadiah=a;C.alokCadangan=b;C.alokOperasional=c;C.alokMingguan=d;if(await persistSettings()){try{updateKasSummary();}catch(e){}showToast('✓ Alokasi kas disimpan');}}
+async function saveSettingsInfo(){const C=GMC_CFG;const cards=settingsCards();const t=cards[3]?cards[3].querySelectorAll('input'):[];C.nama=(t[0]&&t[0].value.trim())||C.nama;C.singkatan=(t[1]&&t[1].value.trim())||C.singkatan;C.host=(t[2]&&t[2].value.trim())||C.host;C.sewa=gmcGetVal(3,3,C.sewa);C.paket=gmcGetVal(3,4,C.paket);if(await persistSettings()){applyBranding();showToast('✓ Info komunitas disimpan');}}
+
+function updateKasSummary(){
+  const C=GMC_CFG;
+  const sel=(kasMonth==='all')?null:kasMonth;
+  const rows=kasData.filter(tx=>!sel||tx.month===sel);
+  const tin=rows.filter(t=>t.type==='in').reduce((a,t)=>a+(t.amt||0),0);
+  const tout=rows.filter(t=>t.type==='out').reduce((a,t)=>a+(t.amt||0),0);
+  const saldo=kasData.length>0?(kasData[0].saldo||0):0;
+  const lbl=sel||'Semua periode';
+  const q=(qq,v)=>{const e=document.querySelector(qq);if(e)e.textContent=v;};
+  const g=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const fmt=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+  q('.kas-amount.kas-in',fmt(tin));q('.kas-amount.kas-out',fmt(tout));q('.kas-amount.kas-net',fmt(saldo));
+  g('kas-in-sub',lbl);g('kas-out-sub',lbl);g('kas-net-sub','Hadiah: '+fmt(saldo*C.alokHadiah/100));
+  g('alok-hadiah',fmt(saldo*C.alokHadiah/100));g('alok-cadangan',fmt(saldo*C.alokCadangan/100));g('alok-operasional',fmt(saldo*C.alokOperasional/100));g('alok-mingguan',fmt(saldo*C.alokMingguan/100));
+  g('kas-sub','Arus kas & alokasi dana · '+lbl);
+}
+
+async function loadAllData(){
+  setLoadingMsg('Memuat pengaturan...');
+  await loadSettings();
+  setLoadingMsg('Memuat data pemain...');
+  await loadPlayers();
+  setLoadingMsg('Memuat sesi...');
+  await loadSessions();
+  setLoadingMsg('Memuat kas...');
+  await loadKas();
+  fillSettingsUI();applyBranding();
+}
+const __gmcLP=loadPlayers;
+loadPlayers=async function(){await __gmcLP();try{players.sort((a,b)=>String(a.nick).localeCompare(String(b.nick),'id'));}catch(e){}};
+const __gmcLS=loadSessions;
+loadSessions=async function(){
+  await __gmcLS();
+  try{
+    if(typeof sesiData!=='undefined'){
+      sesiData.forEach(sx=>{sx.hasil=(sx.hasil||[]).filter(mj=>parseInt(mj.mejaNo)!==0);});
+      renderHistory();
+    }
+  }catch(e){console.error(e);}
+};
+
+async function saveSession(formData){
+  if(!currentUserId)return false;
+  const C=GMC_CFG;
+  const tgl=formData.tgl,dur=formData.dur,mejaCount=formData.mejaCount,note=formData.note,mejaResults=formData.mejaResults;
+  const ins=await sb.from('gmc_sessions').insert({user_id:currentUserId,tgl:tgl,dur:dur,jumlah_meja:mejaCount,jumlah_pemain:mejaResults.reduce((a,m)=>a+m.players.filter(p=>p.pid).length,0),note:note}).select().single();
+  if(ins.error){showToast('Error simpan sesi: '+ins.error.message);return false;}
+  const sessionId=ins.data.id;
+  const resultRows=[];const playerUpdates={};const rajaSet=new Set();
+  for(const meja of mejaResults){
+    const entries=meja.players.filter(p=>p.pid);
+    const computed=calcPoinMeja(entries);
+    for(const r of computed){
+      if(!r.pid)continue;
+      resultRows.push({session_id:sessionId,meja_no:meja.mejaNo,player_id:r.pid,wins:r.wins,poin:r.pts,posisi:r.label});
+      if(!playerUpdates[r.pid])playerUpdates[r.pid]={pts:0,wins:0,games:0};
+      playerUpdates[r.pid].pts+=r.pts;
+      playerUpdates[r.pid].games+=1;
+      if(String(r.label||'').includes('Juara')){playerUpdates[r.pid].wins+=1;rajaSet.add(r.pid);}
+    }
+  }
+  if(resultRows.length>0){
+    const rr=await sb.from('gmc_session_results').insert(resultRows);
+    if(rr.error){showToast('Error simpan hasil: '+rr.error.message);return false;}
+  }
+  const mStr=gmcMonthStr(new Date(tgl));
+  const attend={};
+  ((typeof sesiData!=='undefined')?sesiData:[]).forEach(sx=>{
+    if(gmcMonthStr(new Date(sx.tgl))!==mStr)return;
+    (sx.hasil||[]).forEach(mj=>(mj.players||[]).forEach(r=>{const pid=(r.pid!==undefined&&r.pid!==null)?r.pid:r.id;if(pid!=null)attend[pid]=(attend[pid]||0)+1;}));
+  });
+  const bonusRows=[];
+  for(const pid of Object.keys(playerUpdates)){
+    const delta=playerUpdates[pid];
+    const player=players.find(p=>p.id===parseInt(pid));
+    if(!player)continue;
+    let bonus=0;
+    const newStreak=rajaSet.has(parseInt(pid))?((player.streak||0)+1):0;
+    if(newStreak>0&&newStreak%3===0){bonus+=C.streakBonus;bonusRows.push({session_id:sessionId,meja_no:0,player_id:parseInt(pid),wins:0,poin:C.streakBonus,posisi:'🎁 Bonus Streak'});}
+    if(((attend[pid]||0)+1)===C.hadirSesi){bonus+=C.hadirBonus;bonusRows.push({session_id:sessionId,meja_no:0,player_id:parseInt(pid),wins:0,poin:C.hadirBonus,posisi:'🎁 Bonus Hadir'});}
+    const upd={pts:(player.pts||0)+delta.pts+bonus,wins:(player.wins||0)+delta.wins,games:(player.games||0)+delta.games,streak:newStreak,updated_at:new Date().toISOString()};
+    let u=await sb.from('gmc_players').update(upd).eq('id',parseInt(pid));
+    if(u.error){delete upd.streak;u=await sb.from('gmc_players').update(upd).eq('id',parseInt(pid));}
+    if(u.error)console.error('update player:',u.error);
+  }
+  if(bonusRows.length>0){
+    const br=await sb.from('gmc_session_results').insert(bonusRows);
+    if(br.error)console.error('bonus rows:',br.error);
+  }
+  await loadAllData();
+  return true;
+}
+
+async function editSesiSave(sessionId,formData){
+  if(!currentUserId)return false;
+  const tgl=formData.tgl,dur=formData.dur,note=formData.note,mejaResults=formData.mejaResults;
+  const old=await sb.from('gmc_session_results').select('player_id,poin,meja_no').eq('session_id',sessionId);
+  await sb.from('gmc_session_results').delete().eq('session_id',sessionId).neq('meja_no',0);
+  const resultRows=[];const newPids=new Set();
+  for(const meja of mejaResults){
+    const entries=meja.players.filter(p=>p.pid);
+    const computed=calcPoinMeja(entries);
+    for(const r of computed){
+      if(!r.pid)continue;
+      resultRows.push({session_id:sessionId,meja_no:meja.mejaNo,player_id:r.pid,wins:r.wins,poin:r.pts,posisi:r.label});
+      newPids.add(r.pid);
+    }
+  }
+  if(resultRows.length>0){
+    const rr=await sb.from('gmc_session_results').insert(resultRows);
+    if(rr.error){showToast('Error simpan hasil: '+rr.error.message);return false;}
+  }
+  await sb.from('gmc_sessions').update({tgl:tgl,dur:dur,note:note,edited:true,edit_log:'Diedit '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}).eq('id',sessionId);
+  const allPids=new Set((old.data||[]).map(r=>r.player_id));newPids.forEach(p=>allPids.add(p));
+  for(const pid of allPids){
+    const ar=await sb.from('gmc_session_results').select('poin,posisi,meja_no').eq('player_id',pid);
+    const rows2=ar.data||[];
+    const totalPts=rows2.reduce((a,r)=>a+(r.poin||0),0);
+    const totalWins=rows2.filter(r=>String(r.posisi||'').includes('Juara')).length;
+    const totalGames=rows2.filter(r=>parseInt(r.meja_no)!==0).length;
+    const u=await sb.from('gmc_players').update({pts:totalPts,wins:totalWins,games:totalGames,updated_at:new Date().toISOString()}).eq('id',pid);
+    if(u.error)console.error('recalc player:',u.error);
+  }
+  await loadAllData();
+  return true;
+}
+
+const __gmcAdd=handleAddPlayer;
+handleAddPlayer=async function(){
+  const modal=document.getElementById('modal-player');
+  const t=modal?modal.querySelectorAll('input[type=text]'):[];
+  const nick=(t[1]&&t[1].value||'').trim();
+  if(nick&&players.some(p=>String(p.nick).toLowerCase()===nick.toLowerCase())){showToast('⚠️ Nama panggilan "'+nick+'" sudah dipakai. Gunakan nama panggilan lain.');return;}
+  return __gmcAdd();
+};
+const __gmcEditP=saveEditPlayer;
+saveEditPlayer=async function(){
+  const el=document.getElementById('edit-nickname');
+  const nick=el?el.value.trim():'';
+  const id=(typeof editingPlayerId!=='undefined')?editingPlayerId:null;
+  if(nick&&players.some(p=>p.id!==id&&String(p.nick).toLowerCase()===nick.toLowerCase())){showToast('⚠️ Nama panggilan "'+nick+'" sudah dipakai pemain lain.');return;}
+  return __gmcEditP();
+};
+
+async function renderPublicOnly(){
+  let rows=[];let err=null;
+  try{const r=await sb.from('gmc_public_leaderboard').select('*').order('pts',{ascending:false});rows=r.data||[];err=r.error;}catch(e){err=e;}
+  const hari=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const now=new Date();
+  const tglStr=hari[now.getDay()]+', '+now.getDate()+' '+GMC_MONTHS[now.getMonth()]+' '+now.getFullYear();
+  const body=rows.length?rows.map((p,i)=>{
+    const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    const t=getTier(p.pts||0);
+    return '<tr><td><span class="rank-num '+rc+'">'+(i+1)+'</span></td><td><div class="player-info"><div class="player-avatar" style="background:'+(p.color||'#1a1815')+';color:'+(p.ac||'#c9933a')+'">'+(p.avatar||'?')+'</div><div class="player-name">'+p.nick+'</div></div></td><td><span class="points-val">'+(p.pts||0)+'</span></td><td style="font-family:\'JetBrains Mono\',monospace">'+(p.wins||0)+'</td><td style="font-family:\'JetBrains Mono\',monospace">'+(p.games||0)+'</td><td>'+((p.streak||0)>0?'🔥'+p.streak:'–')+'</td><td>'+getTierBadge(t)+'</td></tr>';
+  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">'+(err?'Data tidak tersedia':'Belum ada data pemain')+'</td></tr>';
+  document.title='Leaderboard · GSBSD Mahjong Community';
+  document.body.innerHTML='<div style="max-width:760px;margin:0 auto;padding:32px 16px 60px">'
+   +'<div style="text-align:center;margin-bottom:24px"><div style="font-size:40px">🀄</div>'
+   +'<div style="font-family:\'Noto Serif SC\',serif;font-size:26px;font-weight:700;color:var(--gold);margin-top:6px">Leaderboard All-Time</div>'
+   +'<div style="font-size:13px;color:var(--muted);margin-top:4px">GSBSD Mahjong Community · '+tglStr+'</div></div>'
+   +'<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Poin</th><th>Raja Meja 👑</th><th>Sesi</th><th>Streak</th><th>Tier</th></tr></thead><tbody>'+body+'</tbody></table></div></div>'
+   +'<div style="text-align:center;margin-top:18px;font-size:11px;color:var(--muted)">Halaman publik GMC · data terbaru setiap halaman dibuka</div></div>';
+}
+
+async function initApp(){
+  try{
+    sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const q=new URLSearchParams(window.location.search);
+    if(q.get('view')==='public'){await renderPublicOnly();return;}
+    setLoadingMsg('Memeriksa sesi login...');
+    const sess=await sb.auth.getSession();
+    const session=sess.data?sess.data.session:null;
+    if(session){currentUser=session.user;currentUserId=session.user.id;await loadAllData();hideOverlays();}
+    else{showLoginOverlay();}
+    sb.auth.onAuthStateChange(async(event,session2)=>{
+      if(event==='SIGNED_IN'&&session2){const first=!currentUserId;currentUser=session2.user;currentUserId=session2.user.id;if(first){await loadAllData();hideOverlays();}}
+      else if(event==='SIGNED_OUT'){currentUser=null;currentUserId=null;showLoginOverlay();}
+    });
+    sb.channel('gmc-players').on('postgres_changes',{event:'*',schema:'public',table:'gmc_players'},()=>{try{renderDashTop5();renderLeaderboard();}catch(e){}}).subscribe();
+  }catch(err){console.error('Init error:',err);setLoadingMsg('Error: '+err.message);showLoginOverlay();}
+}
+window.saveSettingsPoin=saveSettingsPoin;window.saveSettingsTier=saveSettingsTier;window.saveSettingsAlokasi=saveSettingsAlokasi;window.saveSettingsInfo=saveSettingsInfo;
 
 </script>
 </body>

@@ -645,6 +645,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print Panduan</button>
   </div>
 
+  <div class="info-box" style="margin-bottom:22px">
+    <strong>📉 Aturan Decay (Penurunan karena Absen):</strong><br>
+    1. Pemain yang <strong>tidak hadir mabar selama 2 bulan berturut-turut</strong> turun <strong>1 tingkat tier</strong> (contoh: Tier A → Tier B).<br>
+    2. Poin tidak hangus semua — poin disesuaikan ke batas atas tier yang baru.<br>
+    3. Streak otomatis kembali ke 0, karena streak hanya berlaku untuk kehadiran berturut-turut.<br>
+    4. Begitu aktif mabar lagi, poin dan tier bisa naik kembali seperti biasa.<br>
+    <small style="color:var(--muted)">Tujuan: leaderboard tetap adil untuk pemain yang rutin hadir. Saat ini decay diterapkan manual oleh host.</small>
+  </div>
+
   <!-- ══ KNOW YOUR TILES BOARD ══ -->
   <div style="background:linear-gradient(135deg,#c8d8a0 0%,#b8cc8a 100%);border:3px solid #8aaa50;border-radius:16px;padding:20px 16px;margin-bottom:22px;box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden">
 
@@ -2570,6 +2579,33 @@ async function initApp(){
   }catch(err){console.error('Init error:',err);setLoadingMsg('Error: '+err.message);showLoginOverlay();}
 }
 window.saveSettingsPoin=saveSettingsPoin;window.saveSettingsTier=saveSettingsTier;window.saveSettingsAlokasi=saveSettingsAlokasi;window.saveSettingsInfo=saveSettingsInfo;
+
+</script>
+<script>
+
+// ═══ GMC PATCH v4 — dropdown bulan Leaderboard & Kas (mulai Juli 2026) ═══
+function gmcMonthRange(withAll){
+  const start=new Date(2026,6,1);
+  const now=new Date();
+  const out=[];
+  let d=new Date(now.getFullYear(),now.getMonth(),1);
+  while(d>=start){out.push(gmcMonthStr(d));d=new Date(d.getFullYear(),d.getMonth()-1,1);}
+  if(out.length===0)out.push(gmcMonthStr(now));
+  if(withAll)out.push('all');
+  return out;
+}
+function buildLbMonthButtons(){
+  const el=document.getElementById('lb-month-buttons');if(!el)return;
+  const opts=gmcMonthRange(false).map(m=>'<option value="'+m+'"'+(m===lbMonth?' selected':'')+'>📅 '+m+'</option>').join('');
+  el.innerHTML='<select class="form-select" style="width:auto;font-size:13px;padding:6px 12px;cursor:pointer" onchange="setLbMonth(this.value,null)">'+opts+'</select>';
+}
+function buildKasMonthButtons(){
+  const el=document.getElementById('kas-month-buttons');if(!el)return;
+  const opts=gmcMonthRange(true).map(m=>'<option value="'+m+'"'+(m===kasMonth?' selected':'')+'>'+(m==='all'?'📅 Semua Bulan':'📅 '+m)+'</option>').join('');
+  el.innerHTML='<select class="form-select" style="width:auto;font-size:13px;padding:6px 12px;cursor:pointer" onchange="filterKas(this.value,null)">'+opts+'</select>';
+  document.querySelectorAll('#page-kas .filter-bar .month-btn').forEach(b=>{b.style.display='none';});
+}
+document.addEventListener('DOMContentLoaded',function(){try{buildLbMonthButtons();buildKasMonthButtons();}catch(e){}});
 
 </script>
 </body>

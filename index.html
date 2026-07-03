@@ -967,7 +967,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
       <div class="form-group full"><label class="form-label">Catatan</label><input type="text" class="form-input" id="edit-notes"></div>
     </div>
     <div class="warn-box">⚠️ Poin hanya bisa diubah via <strong style="color:var(--text)">Catat Sesi</strong>.</div>
-    <div class="modal-footer"><button class="btn btn-danger btn-sm" onclick="closeModal('modal-edit-player')">Hapus</button><span style="flex:1"></span><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-edit-player')">Batal</button><button class="btn btn-primary btn-sm" onclick="closeModal('modal-edit-player');showToast('✓ Data pemain diperbarui!')">Simpan</button></div>
+    <div class="modal-footer"><button class="btn btn-danger btn-sm" onclick="deletePlayerConfirm()">Hapus</button><span style="flex:1"></span><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-edit-player')">Batal</button><button class="btn btn-primary btn-sm" onclick="closeModal('modal-edit-player');showToast('✓ Data pemain diperbarui!')">Simpan</button></div>
   </div>
 </div>
 
@@ -2709,6 +2709,42 @@ async function loadAllData(){
   }
   fillSettingsUI();applyBranding();
 }
+
+</script>
+<script>
+
+// ═══ GMC PATCH v6 — HAPUS PEMAIN (permanen, by player_id, dengan konfirmasi ganda) ═══
+async function deletePlayerConfirm(){
+  const id=(typeof editingPlayerId!=='undefined')?editingPlayerId:null;
+  if(!id){showToast('Pemain tidak ditemukan');return;}
+  const p=players.find(x=>x.id===id);
+  if(!p){showToast('Pemain tidak ditemukan');return;}
+  const ok1=window.confirm('Hapus pemain "'+p.nick+'" secara PERMANEN?\n\nYang ikut terhapus:\n• Semua poin & peringkat di leaderboard\n• Semua catatan hasil sesinya (menang, posisi, bonus)\n\nPoin pemain lain TIDAK berubah. Tindakan ini tidak bisa dibatalkan.');
+  if(!ok1)return;
+  const ok2=window.confirm('Konfirmasi terakhir: hapus "'+p.nick+'" (ID #'+p.id+') selamanya?');
+  if(!ok2)return;
+  await deletePlayerById(id);
+}
+async function deletePlayerById(id){
+  if(!sb||!currentUserId)return false;
+  const p=players.find(x=>x.id===id);
+  const nick=p?p.nick:('#'+id);
+  const r1=await sb.from('gmc_session_results').delete().eq('player_id',id);
+  if(r1.error){showToast('Gagal hapus hasil sesi: '+r1.error.message);return false;}
+  const r2=await sb.from('gmc_players').delete().eq('id',id).eq('user_id',currentUserId);
+  if(r2.error){showToast('Gagal hapus pemain: '+r2.error.message);return false;}
+  try{
+    const st=await sb.from('gmc_settings').select('value').eq('user_id',currentUserId).eq('key','decay_state').maybeSingle();
+    const state=(st.data&&st.data.value)||{};
+    if(state[id]!==undefined){delete state[id];await sb.from('gmc_settings').upsert({user_id:currentUserId,key:'decay_state',value:state,updated_at:new Date().toISOString()},{onConflict:'user_id,key'});}
+  }catch(e){}
+  closeModal('modal-edit-player');
+  await loadAllData();
+  showToast('🗑️ Pemain "'+nick+'" dihapus permanen beserta seluruh datanya');
+  return true;
+}
+window.deletePlayerConfirm=deletePlayerConfirm;
+window.deletePlayerById=deletePlayerById;
 
 </script>
 </body>

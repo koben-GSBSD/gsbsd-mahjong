@@ -651,7 +651,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     2. Poin tidak hangus semua — poin disesuaikan ke batas atas tier yang baru.<br>
     3. Streak otomatis kembali ke 0, karena streak hanya berlaku untuk kehadiran berturut-turut.<br>
     4. Begitu aktif mabar lagi, poin dan tier bisa naik kembali seperti biasa.<br>
-    <small style="color:var(--muted)">Tujuan: leaderboard tetap adil untuk pemain yang rutin hadir. Saat ini decay diterapkan manual oleh host.</small>
+    <small style="color:var(--muted)">Tujuan: leaderboard tetap adil untuk pemain yang rutin hadir. Decay dijalankan otomatis oleh sistem setiap kali aplikasi dibuka host — pemain yang kena decay tercatat di Riwayat Sesi sebagai "📉 Decay otomatis".</small>
   </div>
 
   <!-- ══ KNOW YOUR TILES BOARD ══ -->
@@ -2606,6 +2606,109 @@ function buildKasMonthButtons(){
   document.querySelectorAll('#page-kas .filter-bar .month-btn').forEach(b=>{b.style.display='none';});
 }
 document.addEventListener('DOMContentLoaded',function(){try{buildLbMonthButtons();buildKasMonthButtons();}catch(e){}});
+
+</script>
+<script>
+
+// ═══ GMC PATCH v5 — DECAY OTOMATIS ═══
+// Deteksi & pencocokan 100% memakai player_id (angka unik database), bukan nama — tidak mungkin tertukar.
+if(GMC_CFG.decayBulan==null)GMC_CFG.decayBulan=2;
+if(GMC_CFG.decayLevel==null)GMC_CFG.decayLevel=1;
+
+function fillSettingsUI(){
+  const cards=settingsCards();if(!cards.length)return;const C=GMC_CFG;
+  gmcSetVal(cards,0,0,C.raja);gmcSetVal(cards,0,1,C.runner);gmcSetVal(cards,0,2,C.dasar);gmcSetVal(cards,0,3,C.runnerMin);gmcSetVal(cards,0,4,C.streakBonus);gmcSetVal(cards,0,5,C.hadirBonus);
+  gmcSetVal(cards,1,0,C.tierS);gmcSetVal(cards,1,1,C.tierA);gmcSetVal(cards,1,2,C.tierB);gmcSetVal(cards,1,4,C.decayBulan);gmcSetVal(cards,1,5,C.decayLevel);
+  gmcSetVal(cards,2,0,C.alokHadiah);gmcSetVal(cards,2,1,C.alokCadangan);gmcSetVal(cards,2,2,C.alokOperasional);gmcSetVal(cards,2,3,C.alokMingguan);
+  const t=cards[3]?cards[3].querySelectorAll('input'):[];
+  if(t[0])t[0].value=C.nama;if(t[1])t[1].value=C.singkatan;if(t[2])t[2].value=C.host;if(t[3])t[3].value=C.sewa;if(t[4])t[4].value=C.paket;
+  const tj=document.querySelectorAll('.tj-item .tj-pts');
+  if(tj.length===4){tj[0].textContent='0 – '+(C.tierB-1);tj[1].textContent=C.tierB+' – '+(C.tierA-1);tj[2].textContent=C.tierA+' – '+(C.tierS-1);tj[3].textContent=C.tierS+'+';}
+  const pl=document.querySelectorAll('.pl-item .pl-pts');
+  if(pl.length===4){pl[0].textContent='+'+C.raja;pl[1].textContent='+'+C.runner;pl[2].textContent='+'+C.dasar;pl[3].textContent='+'+C.dasar;}
+}
+async function saveSettingsTier(){
+  const C=GMC_CFG;
+  C.tierS=gmcGetVal(1,0,C.tierS);C.tierA=gmcGetVal(1,1,C.tierA);C.tierB=gmcGetVal(1,2,C.tierB);
+  C.decayBulan=gmcGetVal(1,4,C.decayBulan);C.decayLevel=gmcGetVal(1,5,C.decayLevel);
+  if(await persistSettings()){fillSettingsUI();try{renderLeaderboard();renderPlayers();renderDashTop5();}catch(e){}showToast('✓ Batas tier & aturan decay disimpan');}
+}
+window.saveSettingsTier=saveSettingsTier;
+
+function gmcTierCap(tier){const C=GMC_CFG;return tier==='A'?C.tierS-1:tier==='B'?C.tierA-1:tier==='C'?C.tierB-1:999999;}
+
+async function checkAndApplyDecay(){
+  if(!sb||!currentUserId)return [];
+  const C=GMC_CFG;
+  const now=new Date();
+  let state={};
+  try{const st=await sb.from('gmc_settings').select('value').eq('user_id',currentUserId).eq('key','decay_state').maybeSingle();state=(st.data&&st.data.value)||{};}catch(e){}
+  const lastPlay={};
+  ((typeof sesiData!=='undefined')?sesiData:[]).forEach(sx=>{
+    const t=new Date(sx.tgl).getTime();
+    (sx.hasil||[]).forEach(mj=>(mj.players||[]).forEach(r=>{
+      const pid=(r.pid!==undefined&&r.pid!==null)?r.pid:r.id;
+      if(pid==null)return;
+      if(!lastPlay[pid]||t>lastPlay[pid])lastPlay[pid]=t;
+    }));
+  });
+  const monthsDiff=(a,b)=>(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth());
+  const order=['C','B','A','S'];
+  const victims=[];
+  for(const p of players){
+    if(p.status!=='Aktif')continue;
+    const joinedT=p.joined?new Date(p.joined).getTime():now.getTime();
+    const lastT=Math.max(lastPlay[p.id]||joinedT,state[p.id]?new Date(state[p.id]).getTime():0);
+    if(monthsDiff(new Date(lastT),now)<C.decayBulan)continue;
+    const tier=getTier(p.pts||0);
+    if(tier==='C'){state[p.id]=now.toISOString();continue;}
+    const tgt=order[Math.max(0,order.indexOf(tier)-(C.decayLevel||1))];
+    const newPts=Math.min(p.pts||0,gmcTierCap(tgt));
+    const delta=(p.pts||0)-newPts;
+    if(delta<=0){state[p.id]=now.toISOString();continue;}
+    victims.push({pid:p.id,nick:p.nick,from:tier,to:tgt,before:p.pts,after:newPts,delta:delta});
+  }
+  if(victims.length){
+    const ins=await sb.from('gmc_sessions').insert({user_id:currentUserId,tgl:now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'),dur:0,jumlah_meja:0,jumlah_pemain:victims.length,note:'📉 Decay otomatis — absen ≥'+C.decayBulan+' bulan: '+victims.map(v=>v.nick+' '+v.from+'→'+v.to+' ('+v.before+'→'+v.after+')').join(', ')}).select().single();
+    if(!ins.error){
+      const rows=victims.map(v=>({session_id:ins.data.id,meja_no:0,player_id:v.pid,wins:0,poin:-v.delta,posisi:'📉 Decay'}));
+      const rr=await sb.from('gmc_session_results').insert(rows);
+      if(!rr.error){
+        for(const v of victims){
+          const u=await sb.from('gmc_players').update({pts:v.after,streak:0,updated_at:now.toISOString()}).eq('id',v.pid);
+          if(!u.error)state[v.pid]=now.toISOString();
+        }
+      }
+    }
+  }
+  try{await sb.from('gmc_settings').upsert({user_id:currentUserId,key:'decay_state',value:state,updated_at:now.toISOString()},{onConflict:'user_id,key'});}catch(e){}
+  return victims;
+}
+window.checkAndApplyDecay=checkAndApplyDecay;
+
+async function loadAllData(){
+  setLoadingMsg('Memuat pengaturan...');
+  await loadSettings();
+  setLoadingMsg('Memuat data pemain...');
+  await loadPlayers();
+  setLoadingMsg('Memuat sesi...');
+  await loadSessions();
+  setLoadingMsg('Memuat kas...');
+  await loadKas();
+  if(!window.__decayChecked){
+    window.__decayChecked=true;
+    setLoadingMsg('Memeriksa decay...');
+    try{
+      const v=await checkAndApplyDecay();
+      if(v&&v.length){
+        await loadPlayers();
+        await loadSessions();
+        setTimeout(function(){showToast('📉 Decay otomatis: '+v.map(x=>x.nick+' ('+x.from+'→'+x.to+', poin '+x.before+'→'+x.after+')').join(' · '));},800);
+      }
+    }catch(e){console.error('decay:',e);}
+  }
+  fillSettingsUI();applyBranding();
+}
 
 </script>
 </body>

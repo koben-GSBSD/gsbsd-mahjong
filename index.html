@@ -2747,5 +2747,16 @@ window.deletePlayerConfirm=deletePlayerConfirm;
 window.deletePlayerById=deletePlayerById;
 
 </script>
+<script>
+
+// ═══ GMC PATCH v7 — fix: simpan ID pemain saat modal edit dibuka ═══
+// Bug bawaan: openEditPlayer tidak pernah menyimpan id → Simpan & Hapus tidak tahu pemain mana.
+const __gmcOpenEdit=openEditPlayer;
+openEditPlayer=function(id){
+  try{editingPlayerId=id;}catch(e){window.editingPlayerId=id;}
+  return __gmcOpenEdit(id);
+};
+
+</script>
 </body>
 </html>

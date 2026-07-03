@@ -306,7 +306,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     <!-- Logo -->
     <div style="text-align:center;margin-bottom:32px">
       <div style="width:72px;height:72px;border-radius:16px;overflow:hidden;margin:0 auto 14px;border:2px solid var(--border);background:var(--card)">
-        <img src="https://design.canva.ai/48fi2WAxiIZjr5P" style="width:100%;height:100%;object-fit:cover"
+        <img src="/Logo%20GMC2.png" style="width:100%;height:100%;object-fit:cover"
           onerror="this.parentElement.innerHTML='<div style=font-size:36px;line-height:72px;text-align:center>🀄</div>'">
       </div>
       <div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--gold)">GMC</div>
@@ -356,7 +356,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
   <div class="logo">
     <!-- LOGO SLOT — klik untuk ganti logo -->
     <div class="logo-slot" id="logo-slot" onclick="openLogoUploader()" title="Klik untuk ganti logo">
-      <img id="logo-img" src="https://design.canva.ai/48fi2WAxiIZjr5P" alt="GMC Logo"
+      <img id="logo-img" src="/Logo%20GMC2.png" alt="GMC Logo"
         onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'">
       <div id="logo-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:26px">🀄</div>
       <div class="logo-slot-overlay">✏️</div>
@@ -1039,7 +1039,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
     <!-- Current logo preview -->
     <div style="text-align:center;margin-bottom:16px">
       <div style="width:80px;height:80px;border-radius:14px;overflow:hidden;margin:0 auto 8px;border:2px solid var(--border);background:var(--surface)">
-        <img id="logo-preview-modal" src="https://design.canva.ai/48fi2WAxiIZjr5P" style="width:100%;height:100%;object-fit:cover">
+        <img id="logo-preview-modal" src="/Logo%20GMC2.png" style="width:100%;height:100%;object-fit:cover">
       </div>
       <div style="font-size:11px;color:var(--muted)">Preview logo saat ini</div>
     </div>
@@ -1476,7 +1476,7 @@ function switchTab(btn,tid){
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>{t.style.opacity='0'},3000);}
 
 // ── LOGO MANAGEMENT ──
-const DEFAULT_LOGO = 'https://design.canva.ai/48fi2WAxiIZjr5P';
+const DEFAULT_LOGO = '/Logo%20GMC2.png';
 
 function openLogoUploader(){openModal('modal-logo');}
 
@@ -2554,7 +2554,7 @@ async function renderPublicOnly(){
   }).join(''):'<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">'+(err?'Data tidak tersedia':'Belum ada data pemain')+'</td></tr>';
   document.title='Leaderboard · GSBSD Mahjong Community';
   document.body.innerHTML='<div style="max-width:760px;margin:0 auto;padding:32px 16px 60px">'
-   +'<div style="text-align:center;margin-bottom:24px"><div style="font-size:40px">🀄</div>'
+   +'<div style="text-align:center;margin-bottom:24px"><img src="/Logo%20GMC2.png" alt="Logo GMC" style="width:min(55vw,220px);height:auto;display:block;margin:0 auto 8px;border-radius:18px" onerror="this.remove()">'
    +'<div style="font-family:\'Noto Serif SC\',serif;font-size:26px;font-weight:700;color:var(--gold);margin-top:6px">Leaderboard All-Time</div>'
    +'<div style="font-size:13px;color:var(--muted);margin-top:4px">GSBSD Mahjong Community · '+tglStr+'</div></div>'
    +'<div class="card"><div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Pemain</th><th>Poin</th><th>Raja Meja 👑</th><th>Sesi</th><th>Streak</th><th>Tier</th></tr></thead><tbody>'+body+'</tbody></table></div></div>'
@@ -2758,5 +2758,6 @@ openEditPlayer=function(id){
 };
 
 </script>
+<script>/* GMC PATCH v8 — logo publik & perbaikan logo */</script>
 </body>
 </html>
